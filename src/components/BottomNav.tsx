@@ -1,9 +1,19 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { IconHome, IconSearch, IconUser } from "@/components/Icons"
+import { IconSearch, IconUser } from "@/components/Icons"
+
+/* 首页用播放图标 */
+function IconPlayer({ size = 24, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M10 8v8l6-4-6-4z" fill="currentColor" />
+    </svg>
+  )
+}
 
 const navItems = [
-  { path: "/", label: "首页", icon: IconHome },
   { path: "/search", label: "搜索", icon: IconSearch },
+  { path: "/", label: "首页", icon: IconPlayer },
   { path: "/profile", label: "我的", icon: IconUser },
 ]
 
@@ -25,18 +35,18 @@ export default function BottomNav() {
               <div
                 className={`p-2 rounded-2xl transition-all duration-300 ${
                   isActive
-                    ? "bg-white/15 scale-110"
-                    : "bg-transparent opacity-50 hover:opacity-80"
+                    ? "bg-black/10 scale-110"
+                    : "bg-transparent opacity-40 hover:opacity-70"
                 }`}
               >
                 <item.icon
                   size={22}
-                  className={isActive ? "text-white" : "text-white/80"}
+                  className={isActive ? "text-black" : "text-black/60"}
                 />
               </div>
               <span
                 className={`text-[10px] font-medium transition-all duration-300 ${
-                  isActive ? "text-white opacity-100" : "text-white/40"
+                  isActive ? "text-black" : "text-black/30"
                 }`}
               >
                 {item.label}

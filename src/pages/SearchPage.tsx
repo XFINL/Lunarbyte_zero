@@ -30,19 +30,16 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen px-5 pt-14 pb-28 animate-fade-in">
-      {/* 顶部渐变 */}
-      <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
-
       {/* 标题 */}
-      <h1 className="text-2xl font-semibold text-white mb-5">搜索</h1>
+      <h1 className="text-2xl font-semibold text-black mb-5">搜索</h1>
 
       {/* 搜索框 */}
       <div
         className={`flex items-center gap-3 glass rounded-2xl px-4 py-3 transition-all duration-300 ${
-          focused ? "ring-1 ring-white/20" : ""
+          focused ? "ring-1 ring-black/10" : ""
         }`}
       >
-        <IconSearch size={18} className="text-white/40 shrink-0" />
+        <IconSearch size={18} className="text-black/30 shrink-0" />
         <input
           type="text"
           value={query}
@@ -50,10 +47,10 @@ export default function SearchPage() {
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           placeholder="搜索歌曲、歌手..."
-          className="flex-1 bg-transparent text-white placeholder-white/30 text-sm outline-none"
+          className="flex-1 bg-transparent text-black placeholder-black/25 text-sm outline-none"
         />
         {query && (
-          <button onClick={() => handleSearch("")} className="text-white/30 hover:text-white/60">
+          <button onClick={() => handleSearch("")} className="text-black/20 hover:text-black/50">
             <IconClose size={16} />
           </button>
         )}
@@ -63,10 +60,10 @@ export default function SearchPage() {
       {!query && history.length > 0 && (
         <div className="mt-6">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-white/50">搜索历史</span>
+            <span className="text-sm text-black/40">搜索历史</span>
             <button
               onClick={clearHistory}
-              className="text-xs text-white/30 hover:text-white/60"
+              className="text-xs text-black/20 hover:text-black/50"
             >
               清空
             </button>
@@ -76,7 +73,7 @@ export default function SearchPage() {
               <span
                 key={keyword}
                 onClick={() => handleSearch(keyword)}
-                className="glass rounded-xl px-4 py-2 text-sm text-white/70 cursor-pointer hover:bg-white/10 transition-colors"
+                className="glass rounded-xl px-4 py-2 text-sm text-black/60 cursor-pointer hover:bg-black/5 transition-colors"
               >
                 {keyword}
                 <button
@@ -84,7 +81,7 @@ export default function SearchPage() {
                     e.stopPropagation()
                     removeHistory(keyword)
                   }}
-                  className="ml-2 text-white/20 hover:text-white/50 align-middle"
+                  className="ml-2 text-black/15 hover:text-black/40 align-middle"
                 >
                   <IconClose size={12} />
                 </button>
@@ -97,7 +94,7 @@ export default function SearchPage() {
       {/* 搜索结果 */}
       {query && (
         <div className="mt-6 space-y-1">
-          <p className="text-sm text-white/40 mb-3">
+          <p className="text-sm text-black/30 mb-3">
             找到 {results.length} 首歌曲
           </p>
           {results.map((song) => {
@@ -110,10 +107,10 @@ export default function SearchPage() {
                 className={`flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all duration-200 ${
                   isActive
                     ? "glass-strong"
-                    : "hover:bg-white/5"
+                    : "hover:bg-black/3"
                 }`}
               >
-                <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0 bg-white/5">
+                <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0 bg-black/5">
                   <img
                     src={song.cover}
                     alt={song.title}
@@ -123,12 +120,12 @@ export default function SearchPage() {
                 <div className="flex-1 min-w-0">
                   <p
                     className={`text-sm font-medium truncate ${
-                      isActive ? "text-white" : "text-white/80"
+                      isActive ? "text-black" : "text-black/70"
                     }`}
                   >
                     {song.title}
                   </p>
-                  <p className="text-xs text-white/40 truncate mt-0.5">
+                  <p className="text-xs text-black/35 truncate mt-0.5">
                     {song.artist}
                   </p>
                 </div>
@@ -138,7 +135,7 @@ export default function SearchPage() {
                     toggleFavorite(song)
                   }}
                   className={`shrink-0 transition-colors ${
-                    isFav ? "text-white" : "text-white/20 hover:text-white/50"
+                    isFav ? "text-black" : "text-black/20 hover:text-black/50"
                   }`}
                 >
                   {isFav ? <IconHeartFilled size={18} /> : <IconHeart size={18} />}
@@ -147,7 +144,7 @@ export default function SearchPage() {
             )
           })}
           {results.length === 0 && query && (
-            <div className="text-center py-12 text-white/30 text-sm">
+            <div className="text-center py-12 text-black/25 text-sm">
               未找到相关歌曲
             </div>
           )}

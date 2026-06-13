@@ -7,7 +7,7 @@ import BottomNav from "@/components/BottomNav"
 export default function App() {
   return (
     <Router>
-      <div className="relative min-h-screen bg-black max-w-md mx-auto overflow-hidden select-none">
+      <div className="relative min-h-screen bg-white max-w-md mx-auto select-none">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/search" element={<SearchPage />} />
