@@ -146,8 +146,25 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     },
     resumeFromPlaylist: () => {
       const { currentSong, playlist } = get()
-      if (!currentSong && playlist.length > 0) {
-        const song = playlist[0]
+
+      // 兜底：内存 playlist 为空但 localStorage 有数据 → 重新加载
+      let songList = playlist
+      if (songList.length === 0) {
+        const stored = loadPlaylist()
+        if (stored.length > 0) {
+          songList = stored
+          // 同时恢复 currentSong
+          const saved = loadCurrentSong(stored)
+          if (saved) {
+            set({ playlist: stored, currentSong: saved })
+            return
+          }
+          set({ playlist: stored })
+        }
+      }
+
+      if (!currentSong && songList.length > 0) {
+        const song = songList[0]
         saveCurrentId(song.id)
         if (song.url) playAudio(song.url)
         set({ currentSong: song, isPlaying: true, progress: 0 })
