@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import { useUserStore } from "@/store/userStore"
 import { usePlayerStore } from "@/store/playerStore"
 import { IconUser, IconHeart, IconHeartFilled, IconClose, IconSearch } from "@/components/Icons"
@@ -7,7 +6,6 @@ import { IconUser, IconHeart, IconHeartFilled, IconClose, IconSearch } from "@/c
 export default function ProfilePage() {
   const { profile, favorites, updateName, getRemainingSearches, getDailyLimit } = useUserStore()
   const { play, currentSong, togglePlay } = usePlayerStore()
-  const navigate = useNavigate()
   const [editing, setEditing] = useState(false)
   const [nameInput, setNameInput] = useState(profile.name)
 
