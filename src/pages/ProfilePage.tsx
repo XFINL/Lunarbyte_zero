@@ -1,18 +1,27 @@
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useUserStore } from "@/store/userStore"
 import { usePlayerStore } from "@/store/playerStore"
-import {
-  IconUser,
-  IconHeart,
-  IconClock,
-  IconList,
-  IconPlay,
-} from "@/components/Icons"
+import { IconUser, IconHeart, IconHeartFilled, IconClose, IconSearch } from "@/components/Icons"
 
 export default function ProfilePage() {
-  const { favorites, recentPlays, playlists } = useUserStore()
-  const { play, currentSong, isPlaying, togglePlay } = usePlayerStore()
+  const { profile, favorites, updateName, getRemainingSearches, getDailyLimit } = useUserStore()
+  const { play, currentSong, togglePlay } = usePlayerStore()
+  const navigate = useNavigate()
+  const [editing, setEditing] = useState(false)
+  const [nameInput, setNameInput] = useState(profile.name)
 
-  const handlePlaySong = (song: typeof favorites[0]) => {
+  const handleSaveName = () => {
+    const trimmed = nameInput.trim()
+    if (trimmed) {
+      updateName(trimmed)
+    } else {
+      setNameInput(profile.name)
+    }
+    setEditing(false)
+  }
+
+  const handlePlaySong = (song: (typeof favorites)[0]) => {
     if (currentSong?.id === song.id) {
       togglePlay()
     } else {
@@ -20,107 +29,121 @@ export default function ProfilePage() {
     }
   }
 
+  const remaining = getRemainingSearches()
+  const dailyLimit = getDailyLimit()
+
   return (
     <div className="min-h-screen px-5 pt-14 pb-28 animate-fade-in">
       {/* 用户信息 */}
-      <div className="flex flex-col items-center py-6">
-        <div className="w-20 h-20 rounded-full glass-strong flex items-center justify-center mb-4">
-          <IconUser size={36} className="text-black/50" />
+      <div className="flex items-center gap-4 py-6">
+        <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center shrink-0 overflow-hidden">
+          {profile.avatar ? (
+            <img src={profile.avatar} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <IconUser size={28} className="text-black/30" />
+          )}
         </div>
-        <h1 className="text-xl font-semibold text-black">音乐爱好者</h1>
-        <p className="text-sm text-black/40 mt-1">
-          {favorites.length} 首收藏 · {playlists.length} 个歌单
-        </p>
+        <div className="flex-1 min-w-0">
+          {editing ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSaveName() }}
+                className="flex-1 bg-black/5 rounded-xl px-3 py-2 text-base font-medium text-black outline-none"
+                autoFocus
+              />
+              <button
+                onClick={handleSaveName}
+                className="text-xs text-white bg-black rounded-xl px-3 py-2"
+              >
+                保存
+              </button>
+              <button
+                onClick={() => { setEditing(false); setNameInput(profile.name) }}
+                className="text-black/30 hover:text-black/50"
+              >
+                <IconClose size={16} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-semibold text-black truncate">{profile.name}</h1>
+              <button
+                onClick={() => setEditing(true)}
+                className="text-xs text-black/30 hover:text-black/50 shrink-0"
+              >
+                编辑
+              </button>
+            </div>
+          )}
+          <p className="text-sm text-black/40 mt-0.5">
+            {favorites.length} 首收藏 · {profile.isVip ? "VIP" : "普通用户"}
+          </p>
+        </div>
       </div>
 
-      {/* 快捷入口 */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="glass rounded-2xl p-4 flex flex-col items-center gap-2">
-          <IconHeart size={22} className="text-black/60" />
-          <span className="text-xs text-black/40">收藏</span>
-          <span className="text-lg font-semibold text-black">{favorites.length}</span>
+      {/* 搜索额度 */}
+      <div className="bg-black/5 rounded-2xl p-4 mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <IconSearch size={16} className="text-black/40" />
+            <span className="text-sm text-black/50">今日搜索额度</span>
+          </div>
+          <span className="text-xs text-black/30">
+            {remaining} / {dailyLimit}
+          </span>
         </div>
-        <div className="glass rounded-2xl p-4 flex flex-col items-center gap-2">
-          <IconClock size={22} className="text-black/60" />
-          <span className="text-xs text-black/40">最近</span>
-          <span className="text-lg font-semibold text-black">{recentPlays.length}</span>
-        </div>
-        <div className="glass rounded-2xl p-4 flex flex-col items-center gap-2">
-          <IconList size={22} className="text-black/60" />
-          <span className="text-xs text-black/40">歌单</span>
-          <span className="text-lg font-semibold text-black">{playlists.length}</span>
+        <div className="h-2 bg-black/5 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-black/20 rounded-full transition-all duration-300"
+            style={{ width: `${((dailyLimit - remaining) / dailyLimit) * 100}%` }}
+          />
         </div>
       </div>
 
-      {/* 我的歌单 */}
-      <section className="mb-6">
-        <h2 className="text-base font-medium text-black mb-3">我的歌单</h2>
-        <div className="space-y-2">
-          {playlists.map((pl) => (
-            <div key={pl.id} className="glass rounded-2xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-black">{pl.name}</h3>
-                <span className="text-xs text-black/20">{pl.songs.length} 首</span>
-              </div>
-              <div className="flex gap-2">
-                {pl.songs.map((song) => (
-                  <div
-                    key={song.id}
-                    className="w-10 h-10 rounded-lg overflow-hidden bg-black/5"
-                  >
+      {/* 点赞列表 */}
+      <section>
+        <h2 className="text-base font-medium text-black mb-3">点赞列表</h2>
+        {favorites.length === 0 ? (
+          <div className="flex flex-col items-center py-12 text-black/20">
+            <IconHeart size={40} />
+            <p className="text-sm mt-3 text-black/30">还没有收藏的歌曲</p>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {favorites.map((song) => {
+              const isActive = currentSong?.id === song.id
+              return (
+                <div
+                  key={song.id}
+                  onClick={() => handlePlaySong(song)}
+                  className="flex items-center gap-3 py-3 cursor-pointer border-b border-black/5"
+                >
+                  <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-black/5">
                     <img
                       src={song.cover}
                       alt={song.title}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 最近播放 */}
-      <section>
-        <h2 className="text-base font-medium text-black mb-3">最近播放</h2>
-        <div className="space-y-1">
-          {recentPlays.map((song) => {
-            const isActive = currentSong?.id === song.id
-            return (
-              <div
-                key={song.id}
-                onClick={() => handlePlaySong(song)}
-                className={`flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all duration-200 ${
-                  isActive ? "glass-strong" : "hover:bg-black/3"
-                }`}
-              >
-                <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0 bg-black/5">
-                  <img
-                    src={song.cover}
-                    alt={song.title}
-                    className="w-full h-full object-cover"
-                  />
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={`text-sm truncate ${
+                        isActive ? "text-black font-medium" : "text-black/70"
+                      }`}
+                    >
+                      {song.title}
+                    </p>
+                    <p className="text-xs text-black/35 truncate mt-0.5">{song.artist}</p>
+                  </div>
+                  {isActive && <IconHeartFilled size={14} className="text-black/40 shrink-0" />}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p
-                    className={`text-sm font-medium truncate ${
-                      isActive ? "text-black" : "text-black/70"
-                    }`}
-                  >
-                    {song.title}
-                  </p>
-                  <p className="text-xs text-black/35 truncate mt-0.5">
-                    {song.artist}
-                  </p>
-                </div>
-                {isActive && (
-                  <IconPlay size={16} className="text-black/50 shrink-0" />
-                )}
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </div>
+        )}
       </section>
     </div>
   )

@@ -10,6 +10,7 @@ export default function SearchPage() {
     useSearchStore()
   const { play, currentSong, togglePlay } = usePlayerStore()
   const { isFavorite, toggleFavorite } = useUserStore()
+  const { consumeSearch, canSearch, getRemainingSearches } = useUserStore()
   const [confirmDeleteTag, setConfirmDeleteTag] = useState<string | null>(null)
   const [confirmClearAll, setConfirmClearAll] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -26,16 +27,24 @@ export default function SearchPage() {
   const handleSearch = useCallback(
     async (q: string) => {
       setQuery(q)
+      if (!consumeSearch()) {
+        setToast("今日搜索次数已达上限")
+        return
+      }
       await search(q)
     },
-    [setQuery, search],
+    [setQuery, search, consumeSearch],
   )
 
   const handleSearchClick = useCallback(async () => {
     if (query.trim()) {
+      if (!consumeSearch()) {
+        setToast("今日搜索次数已达上限")
+        return
+      }
       await search(query)
     }
-  }, [query, search])
+  }, [query, search, consumeSearch])
 
   const handleInputChange = useCallback(
     (value: string) => {
