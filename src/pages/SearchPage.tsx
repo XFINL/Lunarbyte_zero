@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import { useSearchStore } from "@/store/searchStore"
 import { usePlayerStore } from "@/store/playerStore"
 import { useUserStore } from "@/store/userStore"
@@ -11,6 +11,9 @@ export default function SearchPage() {
   const { play, currentSong, isPlaying, togglePlay } = usePlayerStore()
   const { isFavorite, toggleFavorite } = useUserStore()
   const [focused, setFocused] = useState(false)
+  const [confirmDeleteTag, setConfirmDeleteTag] = useState<string | null>(null)
+  const [confirmClearAll, setConfirmClearAll] = useState(false)
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleSearch = useCallback(
     (q: string) => {
@@ -28,8 +31,84 @@ export default function SearchPage() {
     }
   }
 
+  // 长按标签
+  const handleTagTouchStart = (keyword: string) => {
+    longPressTimer.current = setTimeout(() => {
+      setConfirmDeleteTag(keyword)
+    }, 500)
+  }
+
+  const handleTagTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
+  }
+
+  const handleConfirmDeleteTag = () => {
+    if (confirmDeleteTag) {
+      removeHistory(confirmDeleteTag)
+    }
+    setConfirmDeleteTag(null)
+  }
+
+  const handleConfirmClearAll = () => {
+    clearHistory()
+    setConfirmClearAll(false)
+  }
+
   return (
     <div className="min-h-screen px-5 pt-14 pb-28 animate-fade-in">
+      {/* 确认弹窗 - 删除单个标签 */}
+      {confirmDeleteTag && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <div className="glass-strong rounded-3xl p-6 mx-5 max-w-xs w-full">
+            <p className="text-sm text-center text-black/70">
+              是否删除搜索词「<span className="text-black font-medium">{confirmDeleteTag}</span>」？
+            </p>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => setConfirmDeleteTag(null)}
+                className="flex-1 glass rounded-2xl py-2.5 text-sm text-black/50"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleConfirmDeleteTag}
+                className="flex-1 bg-black rounded-2xl py-2.5 text-sm text-white"
+              >
+                删除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 确认弹窗 - 清空全部 */}
+      {confirmClearAll && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <div className="glass-strong rounded-3xl p-6 mx-5 max-w-xs w-full">
+            <p className="text-sm text-center text-black/70">
+              确定要清空所有搜索历史吗？
+            </p>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => setConfirmClearAll(false)}
+                className="flex-1 glass rounded-2xl py-2.5 text-sm text-black/50"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleConfirmClearAll}
+                className="flex-1 bg-black rounded-2xl py-2.5 text-sm text-white"
+              >
+                清空
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 标题 */}
       <h1 className="text-2xl font-semibold text-black mb-5">搜索</h1>
 
@@ -62,10 +141,10 @@ export default function SearchPage() {
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-black/40">搜索历史</span>
             <button
-              onClick={clearHistory}
+              onClick={() => setConfirmClearAll(true)}
               className="text-xs text-black/20 hover:text-black/50"
             >
-              清空
+              全部删除
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -73,21 +152,19 @@ export default function SearchPage() {
               <span
                 key={keyword}
                 onClick={() => handleSearch(keyword)}
-                className="glass rounded-xl px-4 py-2 text-sm text-black/60 cursor-pointer hover:bg-black/5 transition-colors"
+                onTouchStart={() => handleTagTouchStart(keyword)}
+                onTouchEnd={handleTagTouchEnd}
+                onContextMenu={(e) => {
+                  e.preventDefault()
+                  setConfirmDeleteTag(keyword)
+                }}
+                className="glass rounded-xl px-4 py-2 text-sm text-black/60 cursor-pointer hover:bg-black/5 transition-colors select-none"
               >
                 {keyword}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    removeHistory(keyword)
-                  }}
-                  className="ml-2 text-black/15 hover:text-black/40 align-middle"
-                >
-                  <IconClose size={12} />
-                </button>
               </span>
             ))}
           </div>
+          <p className="text-xs text-black/15 mt-2">长按标签可删除</p>
         </div>
       )}
 

@@ -134,17 +134,20 @@ export default function HomePage() {
         <p className="text-base text-black/40 mt-1">{currentSong.artist}</p>
       </div>
 
-      {/* 进度条 */}
-      <div className="w-full mt-5 space-y-2">
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={progress}
-          onChange={(e) => setProgress(Number(e.target.value))}
-          className="w-full"
-        />
-        <div className="flex justify-between text-xs text-black/30">
+      {/* 进度条 - 玻璃效果 */}
+      <div className="w-full mt-5">
+        <div className="glass rounded-[100px] px-3 py-2.5">
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={progress}
+            onChange={(e) => setProgress(Number(e.target.value))}
+            style={{ "--progress": `${progress}%` } as React.CSSProperties}
+            className="w-full"
+          />
+        </div>
+        <div className="flex justify-between text-xs text-black/30 mt-2 px-1">
           <span>{formatTime(currentDuration)}</span>
           <span>{formatTime(currentSong.duration)}</span>
         </div>

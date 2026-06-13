@@ -38,7 +38,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   addHistory: (keyword) => {
     const { history } = get()
     const filtered = history.filter((h) => h !== keyword)
-    set({ history: [keyword, ...filtered].slice(0, 8) })
+    set({ history: [keyword, ...filtered].slice(0, 10) })
   },
   removeHistory: (keyword) => {
     set((s) => ({ history: s.history.filter((h) => h !== keyword) }))

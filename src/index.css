@@ -91,38 +91,48 @@ input[type="range"] {
   appearance: none;
   background: transparent;
   cursor: pointer;
+  width: 100%;
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
-  height: 3px;
+  height: 4px;
   border-radius: 2px;
-  background: rgba(0, 0, 0, 0.12);
+  background: linear-gradient(to right, oklch(0.25 0 0) var(--progress), rgba(0, 0, 0, 0.08) var(--progress));
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: black;
-  margin-top: -5.5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  margin-top: -6px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
 }
 
 input[type="range"]::-moz-range-track {
-  height: 3px;
+  height: 4px;
   border-radius: 2px;
-  background: rgba(0, 0, 0, 0.12);
+  background: linear-gradient(to right, oklch(0.25 0 0) var(--progress), rgba(0, 0, 0, 0.08) var(--progress));
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: black;
   border: none;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"]::-moz-range-fill {
+  background: oklch(0.25 0 0);
 }
 
 /* ===== IconFont 图标基础样式 ===== */
