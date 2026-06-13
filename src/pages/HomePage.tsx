@@ -70,21 +70,21 @@ export default function HomePage() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen px-8 pb-28 animate-fade-in relative overflow-hidden"
+      className="flex flex-col items-center min-h-screen px-8 pt-12 animate-fade-in relative overflow-hidden"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
       {/* 滑动提示 */}
       <div
-        className={`swipe-indicator top-24 ${
+        className={`swipe-indicator top-8 ${
           swiping === "up" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"
         }`}
       >
         下一首
       </div>
       <div
-        className={`swipe-indicator bottom-40 ${
+        className={`swipe-indicator bottom-48 ${
           swiping === "down" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
         }`}
       >
@@ -92,7 +92,7 @@ export default function HomePage() {
       </div>
 
       {/* 专辑封面 - 方形无旋转无图标 */}
-      <div className="flex-1 flex items-center justify-center w-full">
+      <div className="flex items-center justify-center w-full mt-6">
         <div className="relative">
           {/* 光影 */}
           <div className="absolute inset-0 bg-black/5 rounded-2xl blur-3xl scale-110" />
@@ -107,7 +107,7 @@ export default function HomePage() {
       </div>
 
       {/* 歌曲信息 */}
-      <div className="w-full text-center mt-6">
+      <div className="w-full text-center mt-5">
         <h1 className="text-2xl font-semibold text-black tracking-tight">
           {currentSong.title}
         </h1>
@@ -115,7 +115,7 @@ export default function HomePage() {
       </div>
 
       {/* 进度条 */}
-      <div className="w-full mt-6 space-y-2">
+      <div className="w-full mt-5 space-y-2">
         <input
           type="range"
           min={0}
