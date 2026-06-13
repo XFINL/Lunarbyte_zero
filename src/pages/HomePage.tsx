@@ -9,18 +9,22 @@ export default function HomePage() {
   const { addRecentPlay } = useUserStore()
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // 滑动手势
+  // 滑动手势 - 只有真正滑动才切歌
   const touchStartY = useRef(0)
   const touchEndY = useRef(0)
+  const hasMoved = useRef(false)
   const [swiping, setSwiping] = useState<"up" | "down" | null>(null)
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY
+    touchEndY.current = e.touches[0].clientY
+    hasMoved.current = false
     setSwiping(null)
   }, [])
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     touchEndY.current = e.touches[0].clientY
+    hasMoved.current = true
     const diff = touchStartY.current - touchEndY.current
     if (Math.abs(diff) > 30) {
       setSwiping(diff > 0 ? "up" : "down")
@@ -30,6 +34,10 @@ export default function HomePage() {
   }, [])
 
   const handleTouchEnd = useCallback(() => {
+    if (!hasMoved.current) {
+      setSwiping(null)
+      return
+    }
     const diff = touchStartY.current - touchEndY.current
     const threshold = 60
     if (diff > threshold) {
