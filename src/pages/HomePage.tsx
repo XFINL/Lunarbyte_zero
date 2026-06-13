@@ -13,9 +13,16 @@ export default function HomePage() {
   const touchStartY = useRef(0)
   const touchEndY = useRef(0)
   const hasMoved = useRef(false)
+  const isDraggingSlider = useRef(false)
   const [swiping, setSwiping] = useState<"up" | "down" | null>(null)
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    // 如果触摸的是进度条，忽略滑动手势
+    if ((e.target as HTMLElement).tagName === "INPUT") {
+      isDraggingSlider.current = true
+      return
+    }
+    isDraggingSlider.current = false
     touchStartY.current = e.touches[0].clientY
     touchEndY.current = e.touches[0].clientY
     hasMoved.current = false
@@ -23,6 +30,7 @@ export default function HomePage() {
   }, [])
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (isDraggingSlider.current) return
     touchEndY.current = e.touches[0].clientY
     hasMoved.current = true
     const diff = touchStartY.current - touchEndY.current
@@ -34,6 +42,10 @@ export default function HomePage() {
   }, [])
 
   const handleTouchEnd = useCallback(() => {
+    if (isDraggingSlider.current) {
+      isDraggingSlider.current = false
+      return
+    }
     if (!hasMoved.current) {
       setSwiping(null)
       return
