@@ -5,13 +5,25 @@ import { playAudio, resumeAudio, pauseAudio } from "@/lib/audio"
 const PLAYLIST_KEY = "playlist"
 const CURRENT_ID_KEY = "currentSongId"
 
-/** 从 localStorage 加载播放列表 */
+const DEFAULT_SONG: Song = {
+  id: "__default__",
+  title: "请添加歌曲",
+  artist: "",
+  cover: "",
+  duration: 0,
+  album: "",
+}
+
+/** 从 localStorage 加载播放列表，空列表时返回默认占位歌 */
 function loadPlaylist(): Song[] {
   try {
     const raw = localStorage.getItem(PLAYLIST_KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) {
+      const parsed: Song[] = JSON.parse(raw)
+      if (parsed.length > 0) return parsed
+    }
   } catch { /* ignore */ }
-  return []
+  return [DEFAULT_SONG]
 }
 
 /** 保存播放列表 */
@@ -65,7 +77,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
       if (song) {
         // 先设置状态再加载音频，确保 currentSong 写入 store
         const { playlist } = get()
-        const filtered = playlist.filter((s) => s.id !== song.id)
+        // 添加真实歌曲时移走默认占位歌
+        const filtered = playlist.filter((s) => s.id !== song.id && s.id !== DEFAULT_SONG.id)
         const updatedPlaylist = [song, ...filtered]
         savePlaylist(updatedPlaylist)
         saveCurrentId(song.id)
@@ -125,6 +138,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
       set({ playlist: songs })
     },
     removeFromPlaylist: (songId) => {
+      if (songId === DEFAULT_SONG.id) return // 默认歌不可删除
       const { playlist, currentSong } = get()
       const updated = playlist.filter((s) => s.id !== songId)
       savePlaylist(updated)
@@ -140,9 +154,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     clearPlaylist: () => {
       const { currentSong } = get()
       if (currentSong?.url) pauseAudio()
-      savePlaylist([])
+      savePlaylist([DEFAULT_SONG])
       saveCurrentId(null)
-      set({ playlist: [], currentSong: null, isPlaying: false, progress: 0 })
+      set({ playlist: [DEFAULT_SONG], currentSong: null, isPlaying: false, progress: 0 })
     },
     resumeFromPlaylist: () => {
       const { currentSong, playlist } = get()

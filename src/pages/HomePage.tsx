@@ -83,8 +83,9 @@ export default function HomePage() {
     }
   }
 
-  // 用 playlist 决定显示空状态还是播放器，不依赖 currentSong
-  if (playlist.length === 0) {
+  // 只有默认占位歌时显示空状态
+  const isEmpty = playlist.length === 1 && playlist[0].id === "__default__"
+  if (isEmpty) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen animate-fade-in px-8">
         <div className="flex flex-col items-center gap-4 text-black/20">
