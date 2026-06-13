@@ -1,11 +1,13 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useUserStore } from "@/store/userStore"
 import { usePlayerStore } from "@/store/playerStore"
-import { IconUser, IconHeart, IconHeartFilled, IconClose, IconSearch } from "@/components/Icons"
+import { IconUser, IconHeart, IconHeartFilled, IconClose, IconSearch, IconSettings, IconArrowRight } from "@/components/Icons"
 
 export default function ProfilePage() {
   const { profile, favorites, updateName, getRemainingSearches, getDailyLimit } = useUserStore()
   const { play, currentSong, togglePlay } = usePlayerStore()
+  const navigate = useNavigate()
   const [editing, setEditing] = useState(false)
   const [nameInput, setNameInput] = useState(profile.name)
 
@@ -32,6 +34,14 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen px-5 pt-14 pb-28 animate-fade-in">
+      {/* 右上角齿轮 */}
+      <button
+        onClick={() => navigate("/settings")}
+        className="absolute top-4 right-5 p-1.5 text-black/30 hover:text-black/60 transition-colors"
+      >
+        <IconSettings size={20} />
+      </button>
+
       {/* 用户信息 */}
       <div className="flex items-center gap-4 py-6">
         <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center shrink-0 overflow-hidden">
@@ -103,7 +113,16 @@ export default function ProfilePage() {
 
       {/* 点赞列表 */}
       <section>
-        <h2 className="text-base font-medium text-black mb-3">点赞列表</h2>
+        <div
+          onClick={() => navigate("/favorites")}
+          className="flex items-center justify-between mb-3 cursor-pointer"
+        >
+          <h2 className="text-base font-medium text-black">点赞列表</h2>
+          <div className="flex items-center gap-1 text-xs text-black/30">
+            <span>{favorites.length} 首</span>
+            <IconArrowRight size={14} />
+          </div>
+        </div>
         {favorites.length === 0 ? (
           <div className="flex flex-col items-center py-12 text-black/20">
             <IconHeart size={40} />
@@ -111,7 +130,7 @@ export default function ProfilePage() {
           </div>
         ) : (
           <div className="space-y-1">
-            {favorites.map((song) => {
+            {favorites.slice(0, 7).map((song) => {
               const isActive = currentSong?.id === song.id
               return (
                 <div
@@ -120,18 +139,10 @@ export default function ProfilePage() {
                   className="flex items-center gap-3 py-3 cursor-pointer border-b border-black/5"
                 >
                   <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-black/5">
-                    <img
-                      src={song.cover}
-                      alt={song.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={song.cover} alt={song.title} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p
-                      className={`text-sm truncate ${
-                        isActive ? "text-black font-medium" : "text-black/70"
-                      }`}
-                    >
+                    <p className={`text-sm truncate ${isActive ? "text-black font-medium" : "text-black/70"}`}>
                       {song.title}
                     </p>
                     <p className="text-xs text-black/35 truncate mt-0.5">{song.artist}</p>
@@ -140,6 +151,14 @@ export default function ProfilePage() {
                 </div>
               )
             })}
+            {favorites.length > 7 && (
+              <button
+                onClick={() => navigate("/favorites")}
+                className="w-full text-center py-3 text-xs text-black/30 hover:text-black/50"
+              >
+                查看全部 {favorites.length} 首 →
+              </button>
+            )}
           </div>
         )}
       </section>

@@ -1,13 +1,15 @@
 import { useCallback, useRef, useState, useEffect } from "react"
 import { usePlayerStore } from "@/store/playerStore"
+import { useUserStore } from "@/store/userStore"
 import { formatTime } from "@/data/mock"
-import { IconList, IconClose, IconMusic, IconPlay } from "@/components/Icons"
+import { IconList, IconClose, IconMusic, IconPlay, IconHeart, IconHeartFilled } from "@/components/Icons"
 
 export default function HomePage() {
   const {
     currentSong, isPlaying, progress, playlist,
     next, prev, setProgress, removeFromPlaylist, clearPlaylist, play, resumeFromPlaylist,
   } = usePlayerStore()
+  const { isFavorite, toggleFavorite } = useUserStore()
 
   // 挂载时如果 currentSong 为空但 playlist 有歌，自动播第一首
   useEffect(() => {
@@ -227,6 +229,17 @@ export default function HomePage() {
                           </p>
                           <p className="text-xs text-black/35 truncate">{song.artist}</p>
                         </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleFavorite(song)
+                          }}
+                          className={`shrink-0 transition-colors ${
+                            isFavorite(song.id) ? "text-black" : "text-black/20 hover:text-black/50"
+                          }`}
+                        >
+                          {isFavorite(song.id) ? <IconHeartFilled size={14} /> : <IconHeart size={14} />}
+                        </button>
                       </div>
                     )
                   })}
