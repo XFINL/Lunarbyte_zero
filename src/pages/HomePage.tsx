@@ -1,11 +1,10 @@
 import { useEffect, useRef, useCallback, useState } from "react"
 import { usePlayerStore } from "@/store/playerStore"
 import { useUserStore } from "@/store/userStore"
-import { IconMusic } from "@/components/Icons"
 import { formatTime } from "@/data/mock"
 
 export default function HomePage() {
-  const { currentSong, isPlaying, progress, next, prev, setProgress, togglePlay } =
+  const { currentSong, isPlaying, progress, next, prev, setProgress } =
     usePlayerStore()
   const { addRecentPlay } = useUserStore()
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -41,11 +40,6 @@ export default function HomePage() {
     setSwiping(null)
   }, [next, prev])
 
-  // 点击封面暂停/播放
-  const handleCoverClick = useCallback(() => {
-    togglePlay()
-  }, [togglePlay])
-
   // 模拟播放进度
   useEffect(() => {
     if (isPlaying) {
@@ -76,7 +70,7 @@ export default function HomePage() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen px-8 pt-16 pb-28 animate-fade-in relative overflow-hidden"
+      className="flex flex-col items-center justify-center min-h-screen px-8 pb-28 animate-fade-in relative overflow-hidden"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -97,33 +91,23 @@ export default function HomePage() {
         上一首
       </div>
 
-      {/* 专辑封面 */}
-      <div className="flex-1 flex items-center justify-center w-full -mt-8">
-        <div className="relative" onClick={handleCoverClick}>
+      {/* 专辑封面 - 方形无旋转无图标 */}
+      <div className="flex-1 flex items-center justify-center w-full">
+        <div className="relative">
           {/* 光影 */}
-          <div className="absolute inset-0 bg-black/5 rounded-full blur-3xl scale-110" />
-          <div
-            className={`relative w-72 h-72 rounded-full overflow-hidden shadow-xl ${
-              isPlaying ? "animate-spin-slow" : "animate-spin-paused"
-            }`}
-          >
+          <div className="absolute inset-0 bg-black/5 rounded-2xl blur-3xl scale-110" />
+          <div className="relative w-72 h-72 rounded-2xl overflow-hidden shadow-xl">
             <img
               src={currentSong.cover}
               alt={currentSong.title}
               className="w-full h-full object-cover"
             />
           </div>
-          {/* 中心装饰 */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm border border-black/10 flex items-center justify-center">
-              <IconMusic size={18} className="text-black/50" />
-            </div>
-          </div>
         </div>
       </div>
 
       {/* 歌曲信息 */}
-      <div className="w-full text-center mt-10">
+      <div className="w-full text-center mt-6">
         <h1 className="text-2xl font-semibold text-black tracking-tight">
           {currentSong.title}
         </h1>
@@ -131,7 +115,7 @@ export default function HomePage() {
       </div>
 
       {/* 进度条 */}
-      <div className="w-full mt-8 space-y-2">
+      <div className="w-full mt-6 space-y-2">
         <input
           type="range"
           min={0}
