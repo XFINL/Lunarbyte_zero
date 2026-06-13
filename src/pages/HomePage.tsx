@@ -1,13 +1,10 @@
-import { useEffect, useRef, useCallback, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { usePlayerStore } from "@/store/playerStore"
-import { useUserStore } from "@/store/userStore"
 import { formatTime } from "@/data/mock"
 
 export default function HomePage() {
   const { currentSong, isPlaying, progress, next, prev, setProgress } =
     usePlayerStore()
-  const { addRecentPlay } = useUserStore()
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // 滑动手势 - 只有真正滑动才切歌
   const touchStartY = useRef(0)
@@ -17,7 +14,6 @@ export default function HomePage() {
   const [swiping, setSwiping] = useState<"up" | "down" | null>(null)
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    // 如果触摸的是进度条，忽略滑动手势
     if ((e.target as HTMLElement).tagName === "INPUT") {
       isDraggingSlider.current = true
       return
@@ -60,30 +56,6 @@ export default function HomePage() {
     setSwiping(null)
   }, [next, prev])
 
-  // 模拟播放进度
-  useEffect(() => {
-    if (isPlaying) {
-      intervalRef.current = setInterval(() => {
-        setProgress(Math.min(100, progress + 0.25))
-      }, 200)
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [isPlaying, progress, setProgress])
-
-  useEffect(() => {
-    setProgress(0)
-  }, [currentSong?.id, setProgress])
-
-  useEffect(() => {
-    if (isPlaying && currentSong) {
-      addRecentPlay(currentSong)
-    }
-  }, [isPlaying, currentSong, addRecentPlay])
-
   if (!currentSong) return null
 
   const currentDuration = Math.floor((progress / 100) * currentSong.duration)
@@ -111,10 +83,9 @@ export default function HomePage() {
         上一首
       </div>
 
-      {/* 专辑封面 - 方形无旋转无图标 */}
+      {/* 专辑封面 */}
       <div className="flex items-center justify-center w-full mt-6">
         <div className="relative">
-          {/* 光影 */}
           <div className="absolute inset-0 bg-black/5 rounded-2xl blur-3xl scale-110" />
           <div className="relative w-72 h-72 rounded-2xl overflow-hidden shadow-xl">
             <img
@@ -134,7 +105,7 @@ export default function HomePage() {
         <p className="text-base text-black/40 mt-1">{currentSong.artist}</p>
       </div>
 
-      {/* 进度条 - 玻璃条体 */}
+      {/* 进度条 */}
       <div className="w-full mt-5">
         <input
           type="range"
