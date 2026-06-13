@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useUserStore } from "@/store/userStore"
 import { usePlayerStore } from "@/store/playerStore"
 import { IconHeartFilled, IconArrowLeft, IconArrowRight } from "@/components/Icons"
@@ -8,6 +9,7 @@ const PAGE_SIZE = 7
 export default function FavoritesPage() {
   const { favorites } = useUserStore()
   const { play, currentSong, togglePlay } = usePlayerStore()
+  const navigate = useNavigate()
   const [page, setPage] = useState(0)
 
   const totalPages = Math.max(1, Math.ceil(favorites.length / PAGE_SIZE))
@@ -24,7 +26,12 @@ export default function FavoritesPage() {
 
   return (
     <div className="min-h-screen px-5 pt-14 pb-28 animate-fade-in">
-      <h1 className="text-2xl font-semibold text-black mb-5">点赞列表</h1>
+      <div className="flex items-center gap-3 mb-5">
+        <button onClick={() => navigate(-1)} className="p-1 text-black/30 hover:text-black/60">
+          <IconArrowLeft size={22} />
+        </button>
+        <h1 className="text-2xl font-semibold text-black">点赞列表</h1>
+      </div>
 
       {favorites.length === 0 ? (
         <div className="flex flex-col items-center py-16 text-black/20">

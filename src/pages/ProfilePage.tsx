@@ -1,12 +1,10 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useUserStore } from "@/store/userStore"
-import { usePlayerStore } from "@/store/playerStore"
-import { IconUser, IconHeart, IconHeartFilled, IconClose, IconSearch, IconSettings, IconArrowRight } from "@/components/Icons"
+import { IconUser, IconHeartFilled, IconClose, IconSearch, IconSettings, IconArrowRight } from "@/components/Icons"
 
 export default function ProfilePage() {
   const { profile, favorites, updateName, getRemainingSearches, getDailyLimit } = useUserStore()
-  const { play, currentSong, togglePlay } = usePlayerStore()
   const navigate = useNavigate()
   const [editing, setEditing] = useState(false)
   const [nameInput, setNameInput] = useState(profile.name)
@@ -19,14 +17,6 @@ export default function ProfilePage() {
       setNameInput(profile.name)
     }
     setEditing(false)
-  }
-
-  const handlePlaySong = (song: (typeof favorites)[0]) => {
-    if (currentSong?.id === song.id) {
-      togglePlay()
-    } else {
-      play(song)
-    }
   }
 
   const remaining = getRemainingSearches()
@@ -115,52 +105,17 @@ export default function ProfilePage() {
       <section>
         <div
           onClick={() => navigate("/favorites")}
-          className="flex items-center justify-between mb-3 cursor-pointer"
+          className="flex items-center justify-between bg-black/5 rounded-2xl p-4 cursor-pointer hover:bg-black/10 transition-colors"
         >
-          <h2 className="text-base font-medium text-black">点赞列表</h2>
+          <div className="flex items-center gap-3">
+            <IconHeartFilled size={18} className="text-black/40" />
+            <span className="text-sm font-medium text-black">点赞列表</span>
+          </div>
           <div className="flex items-center gap-1 text-xs text-black/30">
             <span>{favorites.length} 首</span>
             <IconArrowRight size={14} />
           </div>
         </div>
-        {favorites.length === 0 ? (
-          <div className="flex flex-col items-center py-12 text-black/20">
-            <IconHeart size={40} />
-            <p className="text-sm mt-3 text-black/30">还没有收藏的歌曲</p>
-          </div>
-        ) : (
-          <div className="space-y-1">
-            {favorites.slice(0, 7).map((song) => {
-              const isActive = currentSong?.id === song.id
-              return (
-                <div
-                  key={song.id}
-                  onClick={() => handlePlaySong(song)}
-                  className="flex items-center gap-3 py-3 cursor-pointer border-b border-black/5"
-                >
-                  <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-black/5">
-                    <img src={song.cover} alt={song.title} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm truncate ${isActive ? "text-black font-medium" : "text-black/70"}`}>
-                      {song.title}
-                    </p>
-                    <p className="text-xs text-black/35 truncate mt-0.5">{song.artist}</p>
-                  </div>
-                  {isActive && <IconHeartFilled size={14} className="text-black/40 shrink-0" />}
-                </div>
-              )
-            })}
-            {favorites.length > 7 && (
-              <button
-                onClick={() => navigate("/favorites")}
-                className="w-full text-center py-3 text-xs text-black/30 hover:text-black/50"
-              >
-                查看全部 {favorites.length} 首 →
-              </button>
-            )}
-          </div>
-        )}
       </section>
     </div>
   )
