@@ -3,11 +3,19 @@ import type { Song } from "@/data/mock"
 
 const USER_KEY = "userProfile"
 const QUOTA_KEY = "searchQuota"
+const SETTINGS_KEY = "appSettings"
 
 interface UserProfile {
   name: string
   avatar: string
   isVip: boolean
+}
+
+interface AppSettings {
+  fontSize: "small" | "normal" | "large"
+  colorScheme: "light" | "dark"
+  language: "zh" | "en"
+  timerMinutes: number // 定时关闭分钟数，0=关闭
 }
 
 interface SearchQuota {
@@ -32,7 +40,6 @@ function loadQuota(): SearchQuota {
     const raw = localStorage.getItem(QUOTA_KEY)
     if (raw) {
       const q: SearchQuota = JSON.parse(raw)
-      // 检查是否同一天，不是则重置
       const today = new Date().toISOString().slice(0, 10)
       if (q.date === today) return q
     }
@@ -44,12 +51,26 @@ function saveQuota(q: SearchQuota) {
   try { localStorage.setItem(QUOTA_KEY, JSON.stringify(q)) } catch { /* ignore */ }
 }
 
+function loadSettings(): AppSettings {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY)
+    if (raw) return JSON.parse(raw)
+  } catch { /* ignore */ }
+  return { fontSize: "normal", colorScheme: "light", language: "zh", timerMinutes: 0 }
+}
+
+function saveSettings(s: AppSettings) {
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)) } catch { /* ignore */ }
+}
+
 interface UserState {
   profile: UserProfile
   favorites: Song[]
   recentPlays: Song[]
   quota: SearchQuota
+  settings: AppSettings
   updateName: (name: string) => void
+  updateSettings: (s: Partial<AppSettings>) => void
   toggleFavorite: (song: Song) => void
   isFavorite: (songId: string) => boolean
   addRecentPlay: (song: Song) => void
@@ -68,11 +89,19 @@ export const useUserStore = create<UserState>((set, get) => ({
   favorites: [],
   recentPlays: [],
   quota: loadQuota(),
+  settings: loadSettings(),
 
   updateName: (name) => {
     const updated = { ...get().profile, name }
     set({ profile: updated })
     saveProfile(updated)
+  },
+
+  updateSettings: (partial) => {
+    const current = get().settings
+    const updated = { ...current, ...partial }
+    set({ settings: updated })
+    saveSettings(updated)
   },
 
   toggleFavorite: (song) => {

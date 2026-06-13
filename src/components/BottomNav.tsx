@@ -13,6 +13,9 @@ export default function BottomNav() {
   const navigate = useNavigate()
   const { isPlaying, togglePlay } = usePlayerStore()
 
+  // 设置页不显示底部导航
+  if (location.pathname === "/settings") return null
+
   const onNavClick = (path: string) => {
     if (path === "/" && location.pathname === "/") {
       // 已在首页时点击切换播放/暂停

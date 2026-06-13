@@ -1,86 +1,215 @@
 import { useState } from "react"
-import { useUserStore } from "@/store/userStore"
-import { IconClose } from "@/components/Icons"
 import { useNavigate } from "react-router-dom"
+import { useUserStore } from "@/store/userStore"
+import { IconArrowLeft, IconArrowRight } from "@/components/Icons"
+
+type Section = "general" | "experimental" | "language" | "about"
+
+interface SectionState {
+  general: boolean
+  experimental: boolean
+  language: boolean
+  about: boolean
+}
+
+const FONT_OPTIONS = [
+  { value: "small" as const, label: "小" },
+  { value: "normal" as const, label: "标准" },
+  { value: "large" as const, label: "大" },
+]
+
+const COLOR_OPTIONS = [
+  { value: "light" as const, label: "浅色" },
+  { value: "dark" as const, label: "深色" },
+]
+
+const LANG_OPTIONS = [
+  { value: "zh" as const, label: "中文" },
+  { value: "en" as const, label: "English" },
+]
 
 export default function SettingsPage() {
-  const { profile, updateName } = useUserStore()
   const navigate = useNavigate()
-  const [editing, setEditing] = useState(false)
-  const [nameInput, setNameInput] = useState(profile.name)
+  const { settings, updateSettings } = useUserStore()
+  const [open, setOpen] = useState<SectionState>({
+    general: false,
+    experimental: false,
+    language: false,
+    about: false,
+  })
 
-  const handleSave = () => {
-    if (nameInput.trim()) {
-      updateName(nameInput.trim())
-    } else {
-      setNameInput(profile.name)
-    }
-    setEditing(false)
+  const toggle = (s: Section) => {
+    setOpen((prev) => ({ ...prev, [s]: !prev[s] }))
   }
 
   return (
     <div className="min-h-screen px-5 pt-14 pb-28 animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-black">设置</h1>
-        <button onClick={() => navigate(-1)} className="text-black/30 hover:text-black/60">
-          <IconClose size={20} />
+      {/* 头部 */}
+      <div className="flex items-center gap-3 mb-6">
+        <button onClick={() => navigate(-1)} className="p-1 text-black/30 hover:text-black/60">
+          <IconArrowLeft size={22} />
         </button>
+        <h1 className="text-2xl font-semibold text-black">设置</h1>
       </div>
 
-      {/* 用户信息 */}
-      <section className="mb-6">
-        <h2 className="text-sm text-black/40 mb-3">用户信息</h2>
-        <div className="bg-black/5 rounded-2xl p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center shrink-0">
-              <span className="text-sm text-black/40 font-medium">
-                {(profile.name[0] || "?").toUpperCase()}
-              </span>
+      {/* ===== 通用设置 ===== */}
+      <div className="rounded-2xl bg-black/5 mb-3 overflow-hidden">
+        <button
+          onClick={() => toggle("general")}
+          className="flex items-center justify-between w-full px-5 py-4"
+        >
+          <span className="text-sm font-medium text-black">通用设置</span>
+          <div className={`transition-transform duration-200 ${open.general ? "rotate-90" : ""}`}>
+            <IconArrowRight size={16} className="text-black/30" />
+          </div>
+        </button>
+        {open.general && (
+          <div className="px-5 pb-4 space-y-4 border-t border-black/5 pt-4">
+            {/* 字体大小 */}
+            <div>
+              <p className="text-xs text-black/40 mb-2">字体大小</p>
+              <div className="flex gap-2">
+                {FONT_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => updateSettings({ fontSize: opt.value })}
+                    className={`px-4 py-2 rounded-xl text-xs transition-all ${
+                      settings.fontSize === opt.value
+                        ? "bg-black text-white"
+                        : "bg-black/5 text-black/50 hover:bg-black/10"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            {editing ? (
-              <div className="flex items-center gap-2 flex-1">
-                <input
-                  type="text"
-                  value={nameInput}
-                  onChange={(e) => setNameInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleSave() }}
-                  className="flex-1 bg-white rounded-xl px-3 py-2 text-sm text-black outline-none border border-black/10"
-                  autoFocus
-                />
-                <button onClick={handleSave} className="text-xs text-white bg-black rounded-xl px-3 py-2">
-                  保存
-                </button>
-                <button onClick={() => { setEditing(false); setNameInput(profile.name) }} className="text-black/30 hover:text-black/50">
-                  <IconClose size={14} />
-                </button>
+            {/* App 配色 */}
+            <div>
+              <p className="text-xs text-black/40 mb-2">App 配色</p>
+              <div className="flex gap-2">
+                {COLOR_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => updateSettings({ colorScheme: opt.value })}
+                    className={`px-4 py-2 rounded-xl text-xs transition-all ${
+                      settings.colorScheme === opt.value
+                        ? "bg-black text-white"
+                        : "bg-black/5 text-black/50 hover:bg-black/10"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
               </div>
-            ) : (
-              <div className="flex-1 flex items-center gap-2">
-                <span className="text-sm font-medium text-black">{profile.name}</span>
-                <button onClick={() => setEditing(true)} className="text-xs text-black/30 hover:text-black/50">
-                  编辑
-                </button>
-              </div>
-            )}
+            </div>
           </div>
-        </div>
-      </section>
+        )}
+      </div>
 
-      {/* 账户类型 */}
-      <section className="mb-6">
-        <h2 className="text-sm text-black/40 mb-3">账户</h2>
-        <div className="bg-black/5 rounded-2xl p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-black/70">账户类型</span>
-            <span className="text-sm font-medium text-black">{profile.isVip ? "VIP 用户" : "普通用户"}</span>
+      {/* ===== 实验功能 ===== */}
+      <div className="rounded-2xl bg-black/5 mb-3 overflow-hidden">
+        <button
+          onClick={() => toggle("experimental")}
+          className="flex items-center justify-between w-full px-5 py-4"
+        >
+          <span className="text-sm font-medium text-black">实验功能</span>
+          <div className={`transition-transform duration-200 ${open.experimental ? "rotate-90" : ""}`}>
+            <IconArrowRight size={16} className="text-black/30" />
           </div>
-          {!profile.isVip && (
-            <p className="text-xs text-black/30 mt-2">
-              普通用户每日搜索上限 12 次，升级 VIP 可获得 100 次 / 天
-            </p>
-          )}
-        </div>
-      </section>
+        </button>
+        {open.experimental && (
+          <div className="px-5 pb-4 space-y-4 border-t border-black/5 pt-4">
+            {/* 定时关闭 */}
+            <div>
+              <p className="text-xs text-black/40 mb-2">定时关闭</p>
+              <div className="flex flex-wrap gap-2">
+                {[0, 15, 30, 45, 60].map((min) => (
+                  <button
+                    key={min}
+                    onClick={() => updateSettings({ timerMinutes: min })}
+                    className={`px-4 py-2 rounded-xl text-xs transition-all ${
+                      settings.timerMinutes === min
+                        ? "bg-black text-white"
+                        : "bg-black/5 text-black/50 hover:bg-black/10"
+                    }`}
+                  >
+                    {min === 0 ? "关闭" : `${min} 分钟`}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ===== 语言设置 ===== */}
+      <div className="rounded-2xl bg-black/5 mb-3 overflow-hidden">
+        <button
+          onClick={() => toggle("language")}
+          className="flex items-center justify-between w-full px-5 py-4"
+        >
+          <span className="text-sm font-medium text-black">语言设置</span>
+          <div className={`transition-transform duration-200 ${open.language ? "rotate-90" : ""}`}>
+            <IconArrowRight size={16} className="text-black/30" />
+          </div>
+        </button>
+        {open.language && (
+          <div className="px-5 pb-4 border-t border-black/5 pt-4">
+            <div className="flex gap-2">
+              {LANG_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => updateSettings({ language: opt.value })}
+                  className={`px-4 py-2 rounded-xl text-xs transition-all ${
+                    settings.language === opt.value
+                      ? "bg-black text-white"
+                      : "bg-black/5 text-black/50 hover:bg-black/10"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ===== 关于我们 ===== */}
+      <div className="rounded-2xl bg-black/5 mb-3 overflow-hidden">
+        <button
+          onClick={() => toggle("about")}
+          className="flex items-center justify-between w-full px-5 py-4"
+        >
+          <span className="text-sm font-medium text-black">关于我们</span>
+          <div className={`transition-transform duration-200 ${open.about ? "rotate-90" : ""}`}>
+            <IconArrowRight size={16} className="text-black/30" />
+          </div>
+        </button>
+        {open.about && (
+          <div className="px-5 pb-4 space-y-3 border-t border-black/5 pt-4">
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm text-black/50">应用名称</span>
+              <span className="text-sm text-black/70">Wave Music</span>
+            </div>
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm text-black/50">版本号</span>
+              <span className="text-sm text-black/70">v1.0.0</span>
+            </div>
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm text-black/50">官网</span>
+              <a
+                href="https://zero.lunarbyte.pw"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-black/70 underline underline-offset-2 hover:text-black"
+              >
+                zero.lunarbyte.pw
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
