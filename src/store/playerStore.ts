@@ -9,7 +9,7 @@ const DEFAULT_SONG: Song = {
   id: "__default__",
   title: "请添加歌曲",
   artist: "",
-  cover: "",
+  cover: "https://t.alcy.cc/moez",
   duration: 0,
   album: "",
 }
