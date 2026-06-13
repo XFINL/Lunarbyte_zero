@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import { useEffect } from "react"
+import { useUserStore } from "@/store/userStore"
 import HomePage from "@/pages/HomePage"
 import SearchPage from "@/pages/SearchPage"
 import ProfilePage from "@/pages/ProfilePage"
@@ -12,9 +14,16 @@ import BottomNav from "@/components/BottomNav"
 import PlayerEngine from "@/components/PlayerEngine"
 
 export default function App() {
+  const colorScheme = useUserStore((s) => s.settings.colorScheme)
+
+  // 同步配色到根元素的 data-theme
+  useEffect(() => {
+    document.documentElement.dataset.theme = colorScheme
+  }, [colorScheme])
+
   return (
     <Router>
-      <div className="relative min-h-screen bg-white max-w-md mx-auto select-none">
+      <div className="relative min-h-screen max-w-md mx-auto select-none" style={{ background: "var(--page-bg)" }}>
         <PlayerEngine />
         <Routes>
           <Route path="/" element={<HomePage />} />

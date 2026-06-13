@@ -15,7 +15,7 @@ interface UserProfile {
 
 interface AppSettings {
   fontSize: "small" | "normal" | "large"
-  colorScheme: "light" | "dark"
+  colorScheme: "white" | "blue" | "lavender" | "green"
   language: "zh" | "en"
   timerMinutes: number // 定时关闭分钟数，0=关闭
 }
@@ -58,7 +58,7 @@ function loadSettings(): AppSettings {
     const raw = localStorage.getItem(SETTINGS_KEY)
     if (raw) return JSON.parse(raw)
   } catch { /* ignore */ }
-  return { fontSize: "normal", colorScheme: "light", language: "zh", timerMinutes: 0 }
+  return { fontSize: "normal", colorScheme: "white", language: "zh", timerMinutes: 0 }
 }
 
 function saveSettings(s: AppSettings) {

@@ -9,8 +9,10 @@ const FONT_OPTIONS = [
 ]
 
 const COLOR_OPTIONS = [
-  { value: "light" as const, label: "浅色" },
-  { value: "dark" as const, label: "深色" },
+  { value: "white" as const, label: "白", color: "#ffffff" },
+  { value: "blue" as const, label: "淡蓝", color: "#e8f4fd" },
+  { value: "lavender" as const, label: "薰衣草", color: "#f3e8ff" },
+  { value: "green" as const, label: "浅绿", color: "#ecfdf5" },
 ]
 
 export default function SettingsGeneralPage() {
@@ -54,12 +56,16 @@ export default function SettingsGeneralPage() {
             <button
               key={opt.value}
               onClick={() => updateSettings({ colorScheme: opt.value })}
-              className={`flex-1 py-3 rounded-xl text-sm transition-all ${
+              className={`flex-1 py-3 rounded-xl text-sm transition-all flex flex-col items-center gap-1.5 ${
                 settings.colorScheme === opt.value
                   ? "bg-black text-white"
                   : "bg-white/50 text-black/50 hover:bg-white/80"
               }`}
             >
+              <span
+                className="w-5 h-5 rounded-full border border-black/10"
+                style={{ background: opt.color }}
+              />
               {opt.label}
             </button>
           ))}
