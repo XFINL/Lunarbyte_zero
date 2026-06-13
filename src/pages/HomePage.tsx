@@ -83,21 +83,9 @@ export default function HomePage() {
     }
   }
 
-  // 只有默认占位歌时显示空状态
-  const isEmpty = playlist.length === 1 && playlist[0].id === "__default__"
-  if (isEmpty) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen animate-fade-in px-8">
-        <div className="flex flex-col items-center gap-4 text-black/20">
-          <IconMusic size={56} />
-          <p className="text-base text-black/30">请添加音乐再来吧</p>
-        </div>
-      </div>
-    )
-  }
-
   // currentSong 可能在第一次渲染时还没设置，用 playlist[0] 兜底
   const displaySong = currentSong ?? playlist[0]
+  const isDefault = displaySong?.id === "__default__"
   const currentDuration = Math.floor((progress / 100) * displaySong.duration)
 
   return (
