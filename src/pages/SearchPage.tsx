@@ -8,9 +8,8 @@ import type { Song } from "@/data/mock"
 export default function SearchPage() {
   const { query, setQuery, results, history, search, removeHistory, clearHistory, loading } =
     useSearchStore()
-  const { play, currentSong, isPlaying, togglePlay } = usePlayerStore()
+  const { play, currentSong, togglePlay } = usePlayerStore()
   const { isFavorite, toggleFavorite } = useUserStore()
-  const [focused, setFocused] = useState(false)
   const [confirmDeleteTag, setConfirmDeleteTag] = useState<string | null>(null)
   const [confirmClearAll, setConfirmClearAll] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -42,7 +41,6 @@ export default function SearchPage() {
     (value: string) => {
       setQuery(value)
       if (!value.trim()) {
-        // 清空时也清空结果
         search("")
       }
     },
@@ -98,14 +96,14 @@ export default function SearchPage() {
       {/* 确认弹窗 - 删除单个标签 */}
       {confirmDeleteTag && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-          <div className="glass-strong rounded-3xl p-6 mx-5 max-w-xs w-full">
+          <div className="bg-white rounded-3xl p-6 mx-5 max-w-xs w-full shadow-xl border border-black/5">
             <p className="text-sm text-center text-black/70">
               是否删除搜索词「<span className="text-black font-medium">{confirmDeleteTag}</span>」？
             </p>
             <div className="flex gap-3 mt-5">
               <button
                 onClick={() => setConfirmDeleteTag(null)}
-                className="flex-1 glass rounded-2xl py-2.5 text-sm text-black/50"
+                className="flex-1 bg-black/5 rounded-2xl py-2.5 text-sm text-black/50"
               >
                 取消
               </button>
@@ -123,14 +121,14 @@ export default function SearchPage() {
       {/* 确认弹窗 - 清空全部 */}
       {confirmClearAll && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-          <div className="glass-strong rounded-3xl p-6 mx-5 max-w-xs w-full">
+          <div className="bg-white rounded-3xl p-6 mx-5 max-w-xs w-full shadow-xl border border-black/5">
             <p className="text-sm text-center text-black/70">
               确定要清空所有搜索历史吗？
             </p>
             <div className="flex gap-3 mt-5">
               <button
                 onClick={() => setConfirmClearAll(false)}
-                className="flex-1 glass rounded-2xl py-2.5 text-sm text-black/50"
+                className="flex-1 bg-black/5 rounded-2xl py-2.5 text-sm text-black/50"
               >
                 取消
               </button>
@@ -148,37 +146,35 @@ export default function SearchPage() {
       {/* 标题 */}
       <h1 className="text-2xl font-semibold text-black mb-5">搜索</h1>
 
-      {/* 搜索框 */}
-      <div
-        className={`flex items-center gap-3 glass rounded-2xl px-4 py-3 transition-all duration-300 ${
-          focused ? "ring-1 ring-black/10" : ""
-        }`}
-      >
-        <button
-          onClick={handleSearchClick}
-          disabled={loading}
-          className="shrink-0"
-        >
-          <IconSearch size={18} className="text-black/30 hover:text-black/60 transition-colors" />
-        </button>
+      {/* 搜索框 - 放大镜内嵌 */}
+      <div className="relative">
+        <IconSearch
+          size={18}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-black/25 pointer-events-none"
+        />
         <input
           type="text"
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") handleSearchClick() }}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
           placeholder="搜索歌曲、歌手..."
-          className="flex-1 bg-transparent text-black placeholder-black/25 text-sm outline-none"
+          className="w-full bg-black/5 rounded-2xl pl-11 pr-20 py-3 text-sm text-black placeholder-black/25 outline-none"
         />
         {query && (
           <button
             onClick={() => handleInputChange("")}
-            className="text-black/20 hover:text-black/50"
+            className="absolute right-10 top-1/2 -translate-y-1/2 text-black/20 hover:text-black/50"
           >
             <IconClose size={16} />
           </button>
         )}
+        <button
+          onClick={handleSearchClick}
+          disabled={loading}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-black/30 hover:text-black/60 transition-colors disabled:opacity-30"
+        >
+          <IconSearch size={18} />
+        </button>
       </div>
 
       {/* 搜索历史 */}
@@ -204,7 +200,7 @@ export default function SearchPage() {
                   e.preventDefault()
                   setConfirmDeleteTag(keyword)
                 }}
-                className="glass rounded-xl px-4 py-2 text-sm text-black/60 cursor-pointer hover:bg-black/5 transition-colors select-none"
+                className="bg-black/5 rounded-xl px-4 py-2 text-sm text-black/60 cursor-pointer hover:bg-black/10 transition-colors select-none"
               >
                 {keyword}
               </span>
@@ -214,10 +210,10 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* 搜索结果 - 紧凑模式 */}
+      {/* 搜索结果 - 纯扁平列表 */}
       {query && (
         <div className="mt-5">
-          <p className="text-sm text-black/30 mb-2 px-1">
+          <p className="text-sm text-black/30 mb-2">
             找到 {results.length} 首歌曲
           </p>
           {results.map((song) => {
@@ -227,9 +223,7 @@ export default function SearchPage() {
               <div
                 key={song.id}
                 onClick={() => handlePlaySong(song)}
-                className={`flex items-center gap-3 py-2.5 px-1 cursor-pointer transition-colors duration-150 border-b border-black/5 ${
-                  isActive ? "bg-black/5 -mx-1 px-3 rounded-lg" : "hover:bg-black/3 -mx-1 px-3 rounded-lg"
-                }`}
+                className="flex items-center gap-3 py-3 cursor-pointer border-b border-black/5"
               >
                 <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-black/5">
                   <img
@@ -269,7 +263,7 @@ export default function SearchPage() {
               搜索中...
             </div>
           )}
-          {!loading && results.length === 0 && query && (
+          {!loading && results.length === 0 && (
             <div className="text-center py-12 text-black/25 text-sm">
               未找到相关歌曲
             </div>
