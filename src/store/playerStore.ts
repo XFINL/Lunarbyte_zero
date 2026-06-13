@@ -51,6 +51,7 @@ interface PlayerState {
   setPlaylist: (songs: Song[]) => void
   removeFromPlaylist: (songId: string) => void
   clearPlaylist: () => void
+  resumeFromPlaylist: () => void
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => {
@@ -142,6 +143,15 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
       savePlaylist([])
       saveCurrentId(null)
       set({ playlist: [], currentSong: null, isPlaying: false, progress: 0 })
+    },
+    resumeFromPlaylist: () => {
+      const { currentSong, playlist } = get()
+      if (!currentSong && playlist.length > 0) {
+        const song = playlist[0]
+        saveCurrentId(song.id)
+        if (song.url) playAudio(song.url)
+        set({ currentSong: song, isPlaying: true, progress: 0 })
+      }
     },
   }
 })

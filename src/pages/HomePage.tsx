@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useRef, useState, useEffect } from "react"
 import { usePlayerStore } from "@/store/playerStore"
 import { formatTime } from "@/data/mock"
 import { IconList, IconClose, IconMusic, IconPlay } from "@/components/Icons"
@@ -6,8 +6,13 @@ import { IconList, IconClose, IconMusic, IconPlay } from "@/components/Icons"
 export default function HomePage() {
   const {
     currentSong, isPlaying, progress, playlist,
-    next, prev, setProgress, removeFromPlaylist, clearPlaylist, play,
+    next, prev, setProgress, removeFromPlaylist, clearPlaylist, play, resumeFromPlaylist,
   } = usePlayerStore()
+
+  // 挂载时如果 currentSong 为空但 playlist 有歌，自动播第一首
+  useEffect(() => {
+    resumeFromPlaylist()
+  }, [resumeFromPlaylist])
 
   // 滑动手势
   const touchStartY = useRef(0)
@@ -78,7 +83,8 @@ export default function HomePage() {
     }
   }
 
-  if (!currentSong) {
+  // 用 playlist 决定显示空状态还是播放器，不依赖 currentSong
+  if (playlist.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen animate-fade-in px-8">
         <div className="flex flex-col items-center gap-4 text-black/20">
@@ -89,7 +95,9 @@ export default function HomePage() {
     )
   }
 
-  const currentDuration = Math.floor((progress / 100) * currentSong.duration)
+  // currentSong 可能在第一次渲染时还没设置，用 playlist[0] 兜底
+  const displaySong = currentSong ?? playlist[0]
+  const currentDuration = Math.floor((progress / 100) * displaySong.duration)
 
   return (
     <div
@@ -128,8 +136,8 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-black/5 rounded-2xl blur-3xl scale-110" />
           <div className="relative w-72 h-72 rounded-2xl overflow-hidden shadow-xl">
             <img
-              src={currentSong.cover}
-              alt={currentSong.title}
+              src={displaySong.cover}
+              alt={displaySong.title}
               className="w-full h-full object-cover"
             />
           </div>
@@ -139,9 +147,9 @@ export default function HomePage() {
       {/* 歌曲信息 */}
       <div className="w-full text-center mt-5">
         <h1 className="text-2xl font-semibold text-black tracking-tight">
-          {currentSong.title}
+          {displaySong.title}
         </h1>
-        <p className="text-base text-black/40 mt-1">{currentSong.artist}</p>
+        <p className="text-base text-black/40 mt-1">{displaySong.artist}</p>
       </div>
 
       {/* 进度条 */}
@@ -157,7 +165,7 @@ export default function HomePage() {
         />
         <div className="flex justify-between text-xs text-black/30 mt-2 px-1">
           <span>{formatTime(currentDuration)}</span>
-          <span>{formatTime(currentSong.duration)}</span>
+          <span>{formatTime(displaySong.duration)}</span>
         </div>
       </div>
 
