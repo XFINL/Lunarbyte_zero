@@ -2,6 +2,24 @@ import { create } from "zustand"
 import type { Song } from "@/data/mock"
 import { searchSongs } from "@/lib/api"
 
+const STORAGE_KEY = "searchHistory"
+
+/** 从 localStorage 加载历史 */
+function loadHistory(): string[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw) return JSON.parse(raw)
+  } catch { /* ignore */ }
+  return ["周杰伦", "邓紫棋", "起风了"]
+}
+
+/** 保存历史到 localStorage */
+function saveHistory(history: string[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history))
+  } catch { /* ignore */ }
+}
+
 /** 将 API 返回数据转为应用的 Song 格式 */
 function toSong(api: { id: string; title: string; author: string; pic: string; url: string }): Song {
   return {
@@ -29,7 +47,7 @@ interface SearchState {
 
 export const useSearchStore = create<SearchState>((set, get) => ({
   query: "",
-  history: ["周杰伦", "邓紫棋", "起风了"],
+  history: loadHistory(),
   results: [],
   loading: false,
   setQuery: (q) => set({ query: q }),
@@ -50,10 +68,17 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   addHistory: (keyword) => {
     const { history } = get()
     const filtered = history.filter((h) => h !== keyword)
-    set({ history: [keyword, ...filtered].slice(0, 10) })
+    const updated = [keyword, ...filtered].slice(0, 10)
+    set({ history: updated })
+    saveHistory(updated)
   },
   removeHistory: (keyword) => {
-    set((s) => ({ history: s.history.filter((h) => h !== keyword) }))
+    const updated = get().history.filter((h) => h !== keyword)
+    set({ history: updated })
+    saveHistory(updated)
   },
-  clearHistory: () => set({ history: [] }),
+  clearHistory: () => {
+    set({ history: [] })
+    saveHistory([])
+  },
 }))

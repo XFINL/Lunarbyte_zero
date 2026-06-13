@@ -1,17 +1,26 @@
 import { useCallback, useRef, useState } from "react"
 import { usePlayerStore } from "@/store/playerStore"
 import { formatTime } from "@/data/mock"
+import { IconList, IconClose, IconMusic } from "@/components/Icons"
 
 export default function HomePage() {
-  const { currentSong, isPlaying, progress, next, prev, setProgress } =
-    usePlayerStore()
+  const {
+    currentSong, isPlaying, progress, playlist,
+    next, prev, setProgress, removeFromPlaylist, clearPlaylist, play,
+  } = usePlayerStore()
 
-  // 滑动手势 - 只有真正滑动才切歌
+  // 滑动手势
   const touchStartY = useRef(0)
   const touchEndY = useRef(0)
   const hasMoved = useRef(false)
   const isDraggingSlider = useRef(false)
   const [swiping, setSwiping] = useState<"up" | "down" | null>(null)
+
+  // 播放列表弹窗
+  const [showPlaylist, setShowPlaylist] = useState(false)
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
+  const [confirmClearAll, setConfirmClearAll] = useState(false)
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if ((e.target as HTMLElement).tagName === "INPUT") {
@@ -56,6 +65,19 @@ export default function HomePage() {
     setSwiping(null)
   }, [next, prev])
 
+  // 长按播放列表项
+  const handleItemTouchStart = (songId: string) => {
+    longPressTimer.current = setTimeout(() => {
+      setConfirmRemove(songId)
+    }, 500)
+  }
+  const handleItemTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
+  }
+
   if (!currentSong) return null
 
   const currentDuration = Math.floor((progress / 100) * currentSong.duration)
@@ -67,6 +89,14 @@ export default function HomePage() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
+      {/* 播放列表展开按钮 - 左上角 */}
+      <button
+        onClick={() => setShowPlaylist(true)}
+        className="absolute top-4 left-4 p-2 text-black/40 hover:text-black/70 transition-colors z-10"
+      >
+        <IconList size={22} />
+      </button>
+
       {/* 滑动提示 */}
       <div
         className={`swipe-indicator top-8 ${
@@ -121,6 +151,142 @@ export default function HomePage() {
           <span>{formatTime(currentSong.duration)}</span>
         </div>
       </div>
+
+      {/* ===== 播放列表弹窗 ===== */}
+      {showPlaylist && (
+        <div className="fixed inset-0 z-50 flex flex-col">
+          {/* 半透明背景 */}
+          <div
+            className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+            onClick={() => setShowPlaylist(false)}
+          />
+          {/* 从上往下滑出的面板 */}
+          <div className="relative bg-white rounded-b-3xl shadow-xl animate-slide-down max-h-[70vh] flex flex-col">
+            {/* 头部 */}
+            <div className="flex items-center justify-between px-5 pt-5 pb-3">
+              <h2 className="text-base font-semibold text-black">
+                播放列表（{playlist.length}）
+              </h2>
+              <div className="flex items-center gap-3">
+                {playlist.length > 0 && (
+                  <button
+                    onClick={() => setConfirmClearAll(true)}
+                    className="text-xs text-black/30 hover:text-black/60 transition-colors"
+                  >
+                    全部移除
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowPlaylist(false)}
+                  className="text-black/30 hover:text-black/60 transition-colors"
+                >
+                  <IconClose size={18} />
+                </button>
+              </div>
+            </div>
+            {/* 列表 */}
+            <div className="overflow-y-auto px-5 pb-5 flex-1">
+              {playlist.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-black/20">
+                  <IconMusic size={40} />
+                  <p className="text-sm mt-3">播放列表为空</p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {playlist.map((song) => {
+                    const isActive = currentSong?.id === song.id
+                    return (
+                      <div
+                        key={song.id}
+                        onClick={() => {
+                          play(song)
+                          setShowPlaylist(false)
+                        }}
+                        onTouchStart={() => handleItemTouchStart(song.id)}
+                        onTouchEnd={handleItemTouchEnd}
+                        onContextMenu={(e) => {
+                          e.preventDefault()
+                          setConfirmRemove(song.id)
+                        }}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-colors select-none ${
+                          isActive ? "bg-black/5" : "hover:bg-black/3"
+                        }`}
+                      >
+                        <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 bg-black/5">
+                          <img src={song.cover} alt={song.title} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-medium truncate ${isActive ? "text-black" : "text-black/70"}`}>
+                            {song.title}
+                          </p>
+                          <p className="text-xs text-black/35 truncate">{song.artist}</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 确认弹窗 - 移除单曲 */}
+      {confirmRemove && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl p-6 mx-5 max-w-xs w-full shadow-xl border border-black/5">
+            <p className="text-sm text-center text-black/70">
+              是否从播放列表中移除该歌曲？
+            </p>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => setConfirmRemove(null)}
+                className="flex-1 bg-black/5 rounded-2xl py-2.5 text-sm text-black/50"
+              >
+                取消
+              </button>
+              <button
+                onClick={() => {
+                  removeFromPlaylist(confirmRemove)
+                  setConfirmRemove(null)
+                }}
+                className="flex-1 bg-black rounded-2xl py-2.5 text-sm text-white"
+              >
+                移除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 确认弹窗 - 全部移除 */}
+      {confirmClearAll && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl p-6 mx-5 max-w-xs w-full shadow-xl border border-black/5">
+            <p className="text-sm text-center text-black/70">
+              确定要清空播放列表吗？
+            </p>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => setConfirmClearAll(false)}
+                className="flex-1 bg-black/5 rounded-2xl py-2.5 text-sm text-black/50"
+              >
+                取消
+              </button>
+              <button
+                onClick={() => {
+                  clearPlaylist()
+                  setConfirmClearAll(false)
+                  setShowPlaylist(false)
+                }}
+                className="flex-1 bg-black rounded-2xl py-2.5 text-sm text-white"
+              >
+                清空
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

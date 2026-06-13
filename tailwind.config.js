@@ -15,11 +15,16 @@ export default {
         "spin-slow": "spin 8s linear infinite",
         "spin-paused": "spin 8s linear infinite paused",
         "fade-in": "fadeIn 0.3s ease-out",
+        "slide-down": "slideDown 0.3s ease-out",
       },
       keyframes: {
         fadeIn: {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        slideDown: {
+          "0%": { transform: "translateY(-100%)" },
+          "100%": { transform: "translateY(0)" },
         },
       },
     },

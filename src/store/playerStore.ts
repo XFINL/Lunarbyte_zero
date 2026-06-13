@@ -15,6 +15,8 @@ interface PlayerState {
   prev: () => void
   setProgress: (progress: number) => void
   setPlaylist: (songs: Song[]) => void
+  removeFromPlaylist: (songId: string) => void
+  clearPlaylist: () => void
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -81,4 +83,21 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   },
   setProgress: (progress) => set({ progress }),
   setPlaylist: (songs) => set({ playlist: songs }),
+  removeFromPlaylist: (songId) => {
+    const { playlist, currentSong } = get()
+    const updated = playlist.filter((s) => s.id !== songId)
+    // 如果移除的是当前歌曲，切到列表第一首
+    if (currentSong?.id === songId) {
+      const next = updated.length > 0 ? updated[0] : null
+      if (next?.url) playAudio(next.url)
+      set({ playlist: updated, currentSong: next, isPlaying: next !== null, progress: 0 })
+    } else {
+      set({ playlist: updated })
+    }
+  },
+  clearPlaylist: () => {
+    const { currentSong } = get()
+    if (currentSong?.url) pauseAudio()
+    set({ playlist: [], currentSong: null, isPlaying: false, progress: 0 })
+  },
 }))

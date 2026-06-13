@@ -214,10 +214,10 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* 搜索结果 */}
+      {/* 搜索结果 - 紧凑模式 */}
       {query && (
-        <div className="mt-6 space-y-1">
-          <p className="text-sm text-black/30 mb-3">
+        <div className="mt-5">
+          <p className="text-sm text-black/30 mb-2 px-1">
             找到 {results.length} 首歌曲
           </p>
           {results.map((song) => {
@@ -227,13 +227,11 @@ export default function SearchPage() {
               <div
                 key={song.id}
                 onClick={() => handlePlaySong(song)}
-                className={`flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all duration-200 ${
-                  isActive
-                    ? "bg-black/5"
-                    : "hover:bg-black/3"
+                className={`flex items-center gap-3 py-2.5 px-1 cursor-pointer transition-colors duration-150 border-b border-black/5 ${
+                  isActive ? "bg-black/5 -mx-1 px-3 rounded-lg" : "hover:bg-black/3 -mx-1 px-3 rounded-lg"
                 }`}
               >
-                <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0 bg-black/5">
+                <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-black/5">
                   <img
                     src={song.cover}
                     alt={song.title}
@@ -242,8 +240,8 @@ export default function SearchPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p
-                    className={`text-sm font-medium truncate ${
-                      isActive ? "text-black" : "text-black/70"
+                    className={`text-sm truncate ${
+                      isActive ? "text-black font-medium" : "text-black/70"
                     }`}
                   >
                     {song.title}
@@ -261,7 +259,7 @@ export default function SearchPage() {
                     isFav ? "text-black" : "text-black/20 hover:text-black/50"
                   }`}
                 >
-                  {isFav ? <IconHeartFilled size={18} /> : <IconHeart size={18} />}
+                  {isFav ? <IconHeartFilled size={16} /> : <IconHeart size={16} />}
                 </button>
               </div>
             )
