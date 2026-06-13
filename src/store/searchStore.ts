@@ -10,7 +10,7 @@ function loadHistory(): string[] {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) return JSON.parse(raw)
   } catch { /* ignore */ }
-  return ["周杰伦", "邓紫棋", "起风了"]
+  return []
 }
 
 /** 保存历史到 localStorage */

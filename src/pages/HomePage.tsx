@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react"
 import { usePlayerStore } from "@/store/playerStore"
 import { formatTime } from "@/data/mock"
-import { IconList, IconClose, IconMusic } from "@/components/Icons"
+import { IconList, IconClose, IconMusic, IconPlay } from "@/components/Icons"
 
 export default function HomePage() {
   const {
@@ -78,7 +78,16 @@ export default function HomePage() {
     }
   }
 
-  if (!currentSong) return null
+  if (!currentSong) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen animate-fade-in px-8">
+        <div className="flex flex-col items-center gap-4 text-black/20">
+          <IconMusic size={56} />
+          <p className="text-base text-black/30">请添加音乐再来吧</p>
+        </div>
+      </div>
+    )
+  }
 
   const currentDuration = Math.floor((progress / 100) * currentSong.duration)
 

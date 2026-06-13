@@ -20,10 +20,10 @@ interface PlayerState {
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
-  currentSong: mockSongs[0],
+  currentSong: null,
   isPlaying: false,
   progress: 0,
-  playlist: mockSongs,
+  playlist: [],
   play: (song) => {
     if (song) {
       // 新歌曲：有 URL 就真实播放，否则静默（mock）
