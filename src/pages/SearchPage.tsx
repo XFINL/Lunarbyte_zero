@@ -6,7 +6,7 @@ import { IconSearch, IconClose, IconHeart, IconHeartFilled } from "@/components/
 import type { Song } from "@/data/mock"
 
 export default function SearchPage() {
-  const { query, setQuery, results, history, search, removeHistory, clearHistory } =
+  const { query, setQuery, results, history, search, removeHistory, clearHistory, loading } =
     useSearchStore()
   const { play, currentSong, isPlaying, togglePlay } = usePlayerStore()
   const { isFavorite, toggleFavorite } = useUserStore()
@@ -16,9 +16,9 @@ export default function SearchPage() {
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleSearch = useCallback(
-    (q: string) => {
+    async (q: string) => {
       setQuery(q)
-      search(q)
+      await search(q)
     },
     [setQuery, search],
   )
@@ -220,7 +220,12 @@ export default function SearchPage() {
               </div>
             )
           })}
-          {results.length === 0 && query && (
+          {loading && (
+            <div className="text-center py-12 text-black/25 text-sm">
+              搜索中...
+            </div>
+          )}
+          {!loading && results.length === 0 && query && (
             <div className="text-center py-12 text-black/25 text-sm">
               未找到相关歌曲
             </div>
