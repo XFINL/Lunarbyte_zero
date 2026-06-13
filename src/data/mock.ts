@@ -5,6 +5,7 @@ export interface Song {
   cover: string
   duration: number
   album: string
+  url?: string
 }
 
 export const mockSongs: Song[] = [

@@ -3,14 +3,15 @@ import type { Song } from "@/data/mock"
 import { searchSongs } from "@/lib/api"
 
 /** 将 API 返回数据转为应用的 Song 格式 */
-function toSong(api: { id: string; title: string; author: string; pic: string }): Song {
+function toSong(api: { id: string; title: string; author: string; pic: string; url: string }): Song {
   return {
     id: api.id,
     title: api.title,
     artist: api.author,
     cover: api.pic.replace(/^http:/, "https:"),
-    duration: 240, // API 不返回时长，使用默认值
+    duration: 240,
     album: api.title,
+    url: api.url, // 真实音频地址
   }
 }
 

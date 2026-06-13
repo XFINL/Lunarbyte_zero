@@ -23,6 +23,23 @@ export default function SearchPage() {
     [setQuery, search],
   )
 
+  const handleSearchClick = useCallback(async () => {
+    if (query.trim()) {
+      await search(query)
+    }
+  }, [query, search])
+
+  const handleInputChange = useCallback(
+    (value: string) => {
+      setQuery(value)
+      if (!value.trim()) {
+        // 清空时也清空结果
+        search("")
+      }
+    },
+    [setQuery, search],
+  )
+
   const handlePlaySong = (song: Song) => {
     if (currentSong?.id === song.id) {
       togglePlay()
@@ -118,18 +135,28 @@ export default function SearchPage() {
           focused ? "ring-1 ring-black/10" : ""
         }`}
       >
-        <IconSearch size={18} className="text-black/30 shrink-0" />
+        <button
+          onClick={handleSearchClick}
+          disabled={loading}
+          className="shrink-0"
+        >
+          <IconSearch size={18} className="text-black/30 hover:text-black/60 transition-colors" />
+        </button>
         <input
           type="text"
           value={query}
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={(e) => handleInputChange(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") handleSearchClick() }}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           placeholder="搜索歌曲、歌手..."
           className="flex-1 bg-transparent text-black placeholder-black/25 text-sm outline-none"
         />
         {query && (
-          <button onClick={() => handleSearch("")} className="text-black/20 hover:text-black/50">
+          <button
+            onClick={() => handleInputChange("")}
+            className="text-black/20 hover:text-black/50"
+          >
             <IconClose size={16} />
           </button>
         )}
