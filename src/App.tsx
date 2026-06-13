@@ -4,6 +4,10 @@ import SearchPage from "@/pages/SearchPage"
 import ProfilePage from "@/pages/ProfilePage"
 import FavoritesPage from "@/pages/FavoritesPage"
 import SettingsPage from "@/pages/SettingsPage"
+import SettingsGeneralPage from "@/pages/SettingsGeneralPage"
+import SettingsExperimentalPage from "@/pages/SettingsExperimentalPage"
+import SettingsLanguagePage from "@/pages/SettingsLanguagePage"
+import SettingsAboutPage from "@/pages/SettingsAboutPage"
 import BottomNav from "@/components/BottomNav"
 import PlayerEngine from "@/components/PlayerEngine"
 
@@ -18,6 +22,10 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/settings/general" element={<SettingsGeneralPage />} />
+          <Route path="/settings/experimental" element={<SettingsExperimentalPage />} />
+          <Route path="/settings/language" element={<SettingsLanguagePage />} />
+          <Route path="/settings/about" element={<SettingsAboutPage />} />
         </Routes>
         <BottomNav />
       </div>

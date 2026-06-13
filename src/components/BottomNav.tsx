@@ -13,8 +13,8 @@ export default function BottomNav() {
   const navigate = useNavigate()
   const { isPlaying, togglePlay } = usePlayerStore()
 
-  // 设置页不显示底部导航
-  if (location.pathname === "/settings") return null
+  // 设置页及其子页面不显示底部导航
+  if (location.pathname.startsWith("/settings")) return null
 
   const onNavClick = (path: string) => {
     if (path === "/" && location.pathname === "/") {
