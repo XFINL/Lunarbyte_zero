@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { useSearchStore } from "@/store/searchStore"
 import { usePlayerStore } from "@/store/playerStore"
 import { useUserStore } from "@/store/userStore"
@@ -13,7 +13,16 @@ export default function SearchPage() {
   const [focused, setFocused] = useState(false)
   const [confirmDeleteTag, setConfirmDeleteTag] = useState<string | null>(null)
   const [confirmClearAll, setConfirmClearAll] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Toast 1s 自动消失
+  useEffect(() => {
+    if (toast) {
+      const t = setTimeout(() => setToast(null), 1000)
+      return () => clearTimeout(t)
+    }
+  }, [toast])
 
   const handleSearch = useCallback(
     async (q: string) => {
@@ -46,6 +55,7 @@ export default function SearchPage() {
     } else {
       play(song)
     }
+    setToast(song.title)
   }
 
   // 长按标签
@@ -76,6 +86,15 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen px-5 pt-14 pb-28 animate-fade-in">
+      {/* 左上角 Toast */}
+      {toast && (
+        <div className="fixed top-4 left-4 z-50 glass rounded-2xl px-4 py-2.5 animate-fade-in">
+          <span className="text-sm text-black/70">
+            已添加「<span className="text-black font-medium">{toast}</span>」
+          </span>
+        </div>
+      )}
+
       {/* 确认弹窗 - 删除单个标签 */}
       {confirmDeleteTag && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
@@ -210,7 +229,7 @@ export default function SearchPage() {
                 onClick={() => handlePlaySong(song)}
                 className={`flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all duration-200 ${
                   isActive
-                    ? "glass-strong"
+                    ? "bg-black/5"
                     : "hover:bg-black/3"
                 }`}
               >
