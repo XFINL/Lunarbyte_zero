@@ -4,6 +4,8 @@ import type { Song } from "@/data/mock"
 const USER_KEY = "userProfile"
 const QUOTA_KEY = "searchQuota"
 const SETTINGS_KEY = "appSettings"
+const FAVORITES_KEY = "favorites"
+const RECENT_KEY = "recentPlays"
 
 interface UserProfile {
   name: string
@@ -63,6 +65,28 @@ function saveSettings(s: AppSettings) {
   try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)) } catch { /* ignore */ }
 }
 
+function loadFavorites(): Song[] {
+  try {
+    const raw = localStorage.getItem(FAVORITES_KEY)
+    if (raw) return JSON.parse(raw)
+  } catch { /* ignore */ }
+  return []
+}
+function saveFavorites(f: Song[]) {
+  try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(f)) } catch { /* ignore */ }
+}
+
+function loadRecentPlays(): Song[] {
+  try {
+    const raw = localStorage.getItem(RECENT_KEY)
+    if (raw) return JSON.parse(raw)
+  } catch { /* ignore */ }
+  return []
+}
+function saveRecentPlays(r: Song[]) {
+  try { localStorage.setItem(RECENT_KEY, JSON.stringify(r)) } catch { /* ignore */ }
+}
+
 interface UserState {
   profile: UserProfile
   favorites: Song[]
@@ -86,8 +110,8 @@ interface UserState {
 
 export const useUserStore = create<UserState>((set, get) => ({
   profile: loadProfile(),
-  favorites: [],
-  recentPlays: [],
+  favorites: loadFavorites(),
+  recentPlays: loadRecentPlays(),
   quota: loadQuota(),
   settings: loadSettings(),
 
@@ -107,11 +131,14 @@ export const useUserStore = create<UserState>((set, get) => ({
   toggleFavorite: (song) => {
     const { favorites } = get()
     const exists = favorites.some((s) => s.id === song.id)
+    let next: Song[]
     if (exists) {
-      set({ favorites: favorites.filter((s) => s.id !== song.id) })
+      next = favorites.filter((s) => s.id !== song.id)
     } else {
-      set({ favorites: [...favorites, song] })
+      next = [...favorites, song]
     }
+    set({ favorites: next })
+    saveFavorites(next)
   },
 
   isFavorite: (songId) => get().favorites.some((s) => s.id === songId),
@@ -119,7 +146,9 @@ export const useUserStore = create<UserState>((set, get) => ({
   addRecentPlay: (song) => {
     const { recentPlays } = get()
     const filtered = recentPlays.filter((s) => s.id !== song.id)
-    set({ recentPlays: [song, ...filtered].slice(0, 20) })
+    const next = [song, ...filtered].slice(0, 20)
+    set({ recentPlays: next })
+    saveRecentPlays(next)
   },
 
   canSearch: () => {
