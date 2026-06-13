@@ -43,8 +43,7 @@ export function playAudio(url: string) {
   const audio = getAudio()
   audio.src = url
   audio.play().catch(() => {
-    // 播放失败（如跨域、格式不支持）
-    usePlayerStore.getState().pause()
+    // 播放失败静默处理，不操作 store 状态
   })
 }
 

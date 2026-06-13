@@ -62,17 +62,17 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     playlist: initialPlaylist,
     play: (song) => {
       if (song) {
-        // 加入播放列表（去重，最新播放置顶）
+        // 先设置状态再加载音频，确保 currentSong 写入 store
         const { playlist } = get()
         const filtered = playlist.filter((s) => s.id !== song.id)
         const updatedPlaylist = [song, ...filtered]
         savePlaylist(updatedPlaylist)
         saveCurrentId(song.id)
+        set({ currentSong: song, playlist: updatedPlaylist, isPlaying: true, progress: 0 })
 
         if (song.url) {
           playAudio(song.url)
         }
-        set({ currentSong: song, playlist: updatedPlaylist, isPlaying: true, progress: 0 })
       } else {
         const { currentSong } = get()
         if (currentSong?.url) {
