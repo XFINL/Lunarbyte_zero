@@ -7,7 +7,7 @@ export default function SettingsAboutPage() {
   return (
     <div className="min-h-screen px-5 pt-14 pb-28 animate-fade-in">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate("/settings")} className="p-1 text-black/30 hover:text-black/60">
+        <button onClick={() => navigate(-1)} className="p-1 text-black/30 hover:text-black/60">
           <IconArrowLeft size={22} />
         </button>
         <h1 className="text-2xl font-semibold text-black">关于我们</h1>
