@@ -218,7 +218,7 @@ export default function SearchPage() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 20, paddingTop: 56, paddingBottom: 112 },
-  toast: { position: "absolute", top: 16, left: 16, elevation: 50, backgroundColor: "rgba(255,255,255,0.9)", borderRadius: 16, paddingHorizontal: 16, paddingVertical: 10, borderWidth: 0.5, borderColor: "rgba(0,0,0,0.06)" },
+  toast: { position: "absolute", top: 16, left: 16, elevation: 5, backgroundColor: "rgba(255,255,255,0.9)", borderRadius: 16, paddingHorizontal: 16, paddingVertical: 10, borderWidth: 0.5, borderColor: "rgba(0,0,0,0.06)" },
   toastText: { fontSize: 14, color: "rgba(0,0,0,0.7)" },
   toastHighlight: { fontWeight: "600", color: "#000" },
   confirmContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.2)" },
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   resultsCount: { fontSize: 14, color: "rgba(0,0,0,0.3)", marginBottom: 8 },
   resultItem: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: "rgba(0,0,0,0.05)" },
   resultCover: { width: 40, height: 40, borderRadius: 8, backgroundColor: "rgba(0,0,0,0.05)" },
-  resultInfo: { flex: 1, minWidth: 0 },
+  resultInfo: { flex: 1 },
   resultTitle: { fontSize: 14, color: "rgba(0,0,0,0.7)" },
   resultTitleActive: { color: "#000", fontWeight: "500" },
   resultArtist: { fontSize: 12, color: "rgba(0,0,0,0.35)", marginTop: 2 },

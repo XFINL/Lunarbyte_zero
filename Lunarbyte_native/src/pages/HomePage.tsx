@@ -1,10 +1,10 @@
 import { StyleSheet, View, Text, Image, TouchableOpacity, Modal, Dimensions } from "react-native"
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect } from "react"
 import { usePlayerStore } from "@/store/playerStore"
 import { useUserStore } from "@/store/userStore"
 import { formatTime } from "@/data/mock"
 import { IconList, IconClose, IconMusic, IconPlay, IconHeart, IconHeartFilled } from "@/components/Icons"
-import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
 
 const SCREEN_HEIGHT = Dimensions.get("window").height
 
@@ -40,7 +40,6 @@ export default function HomePage() {
     }
   }
 
-  // 滑动手势
   const panGesture = Gesture.Pan()
     .onUpdate((e) => {
       const diff = e.translationY
@@ -62,7 +61,7 @@ export default function HomePage() {
     })
 
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       <GestureDetector gesture={panGesture}>
         <View style={styles.content}>
           {/* 播放列表按钮 */}
@@ -74,10 +73,10 @@ export default function HomePage() {
           </TouchableOpacity>
 
           {/* 滑动提示 */}
-          <Text style={[styles.swipeIndicator, { opacity: swiping === "up" ? 1 : 0, top: 32 }]}>
+          <Text style={[styles.swipeIndicatorUp, { opacity: swiping === "up" ? 1 : 0 }]}>
             下一首
           </Text>
-          <Text style={[styles.swipeIndicator, { opacity: swiping === "down" ? 1 : 0, bottom: 192 }]}>
+          <Text style={[styles.swipeIndicatorDown, { opacity: swiping === "down" ? 1 : 0 }]}>
             上一首
           </Text>
 
@@ -98,7 +97,7 @@ export default function HomePage() {
 
           {/* 进度条 */}
           <View style={styles.progressContainer}>
-            <View style={styles.progressTrack} onTouchStart={() => {}}>
+            <View style={styles.progressTrack}>
               <View style={[styles.progressFill, { width: `${progress}%` }]} />
               <View style={[styles.progressThumb, { left: `${progress}%` }]} />
             </View>
@@ -111,9 +110,9 @@ export default function HomePage() {
       </GestureDetector>
 
       {/* 播放列表弹窗 */}
-      <Modal visible={showPlaylist} transparent animationType="slide">
+      <Modal visible={showPlaylist} transparent animationType="slide" onRequestClose={() => setShowPlaylist(false)}>
         <View style={styles.modalContainer}>
-          <TouchableOpacity style={styles.modalBackdrop} onPress={() => setShowPlaylist(false)} />
+          <TouchableOpacity style={styles.modalBackdrop} onPress={() => setShowPlaylist(false)} activeOpacity={1} />
           <View style={styles.playlistPanel}>
             <View style={styles.playlistHeader}>
               <Text style={styles.playlistTitle}>播放列表（{playlist.length}）</Text>
@@ -142,18 +141,17 @@ export default function HomePage() {
                       key={song.id}
                       style={[styles.playlistItem, isActive && styles.playlistItemActive]}
                       onPress={() => { play(song); setShowPlaylist(false) }}
-                      onTouchStart={() => handleItemTouchStart(song.id)}
-                      onTouchEnd={handleItemTouchEnd}
+                      onLongPress={() => setConfirmRemove(song.id)}
                     >
                       <Image source={{ uri: song.cover }} style={styles.playlistCover} />
                       <View style={styles.playlistItemInfo}>
-                        <Text style={[styles.playlistItemTitle, isActive && { color: "#000" }]} numberOfLines={1}>
+                        <Text style={[styles.playlistItemTitle, isActive && styles.playlistItemTitleActive]} numberOfLines={1}>
                           {song.title}
                         </Text>
                         <Text style={styles.playlistItemArtist} numberOfLines={1}>{song.artist}</Text>
                       </View>
                       <TouchableOpacity
-                        onPress={(e) => { e.stopPropagation(); toggleFavorite(song) }}
+                        onPress={() => toggleFavorite(song)}
                       >
                         {isFavorite(song.id)
                           ? <IconHeartFilled size={14} color="#000" />
@@ -170,7 +168,7 @@ export default function HomePage() {
       </Modal>
 
       {/* 确认弹窗 - 移除单曲 */}
-      <Modal visible={!!confirmRemove} transparent animationType="fade">
+      <Modal visible={!!confirmRemove} transparent animationType="fade" onRequestClose={() => setConfirmRemove(null)}>
         <View style={styles.confirmContainer}>
           <View style={styles.confirmDialog}>
             <Text style={styles.confirmText}>是否从播放列表中移除该歌曲？</Text>
@@ -190,7 +188,7 @@ export default function HomePage() {
       </Modal>
 
       {/* 确认弹窗 - 清空 */}
-      <Modal visible={confirmClearAll} transparent animationType="fade">
+      <Modal visible={confirmClearAll} transparent animationType="fade" onRequestClose={() => setConfirmClearAll(false)}>
         <View style={styles.confirmContainer}>
           <View style={styles.confirmDialog}>
             <Text style={styles.confirmText}>确定要清空播放列表吗？</Text>
@@ -208,29 +206,30 @@ export default function HomePage() {
           </View>
         </View>
       </Modal>
-    </GestureHandlerRootView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   content: { flex: 1, alignItems: "center", paddingHorizontal: 32, paddingTop: 48 },
-  playlistButton: { position: "absolute", top: 16, left: 16, padding: 8, elevation: 10 },
-  swipeIndicator: { position: "absolute", left: "50%", marginLeft: -24, fontSize: 12, color: "rgba(0,0,0,0.2)", fontWeight: "500" },
+  playlistButton: { position: "absolute", top: 16, left: 16, padding: 8 },
+  swipeIndicatorUp: { position: "absolute", top: 32, left: "50%", marginLeft: -24, fontSize: 12, color: "rgba(0,0,0,0.2)", fontWeight: "500" },
+  swipeIndicatorDown: { position: "absolute", bottom: 192, left: "50%", marginLeft: -24, fontSize: 12, color: "rgba(0,0,0,0.2)", fontWeight: "500" },
   coverContainer: { alignItems: "center", justifyContent: "center", width: "100%", marginTop: 24 },
-  coverShadow: { position: "absolute", inset: -8, backgroundColor: "rgba(0,0,0,0.05)", borderRadius: 16, filter: "blur(24px)" as any },
+  coverShadow: { position: "absolute", top: -8, bottom: -8, left: -8, right: -8, backgroundColor: "rgba(0,0,0,0.05)", borderRadius: 16 },
   coverImage: { width: 288, height: 288, borderRadius: 16 },
   songInfo: { width: "100%", alignItems: "center", marginTop: 20 },
-  songTitle: { fontSize: 24, fontWeight: "600", color: "#000", letterSpacing: -0.5 },
+  songTitle: { fontSize: 24, fontWeight: "600", color: "#000" },
   songArtist: { fontSize: 16, color: "rgba(0,0,0,0.4)", marginTop: 4 },
   progressContainer: { width: "100%", marginTop: 20 },
-  progressTrack: { height: 6, backgroundColor: "rgba(0,0,0,0.06)", borderRadius: 3, overflow: "visible" },
+  progressTrack: { height: 6, backgroundColor: "rgba(0,0,0,0.06)", borderRadius: 3 },
   progressFill: { height: 6, backgroundColor: "#000", borderRadius: 3 },
-  progressThumb: { position: "absolute", top: -5, width: 16, height: 16, borderRadius: 8, backgroundColor: "#000", marginLeft: -8, shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 4 },
+  progressThumb: { position: "absolute", top: -5, width: 16, height: 16, borderRadius: 8, backgroundColor: "#000", marginLeft: -8 },
   timeRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 8, paddingHorizontal: 4 },
   timeText: { fontSize: 12, color: "rgba(0,0,0,0.3)" },
-  modalContainer: { flex: 1 },
-  modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.2)" },
+  modalContainer: { flex: 1, backgroundColor: "rgba(0,0,0,0.2)" },
+  modalBackdrop: { ...StyleSheet.absoluteFillObject },
   playlistPanel: { backgroundColor: "#fff", borderBottomLeftRadius: 24, borderBottomRightRadius: 24, maxHeight: SCREEN_HEIGHT * 0.7, paddingBottom: 20 },
   playlistHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingTop: 20, paddingBottom: 12 },
   playlistTitle: { fontSize: 16, fontWeight: "600", color: "#000" },
@@ -242,11 +241,12 @@ const styles = StyleSheet.create({
   playlistItem: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, marginBottom: 4 },
   playlistItemActive: { backgroundColor: "rgba(0,0,0,0.05)" },
   playlistCover: { width: 36, height: 36, borderRadius: 8, backgroundColor: "rgba(0,0,0,0.05)" },
-  playlistItemInfo: { flex: 1, minWidth: 0 },
+  playlistItemInfo: { flex: 1 },
   playlistItemTitle: { fontSize: 14, fontWeight: "500", color: "rgba(0,0,0,0.7)" },
+  playlistItemTitleActive: { color: "#000" },
   playlistItemArtist: { fontSize: 12, color: "rgba(0,0,0,0.35)", marginTop: 2 },
   confirmContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.2)" },
-  confirmDialog: { backgroundColor: "#fff", borderRadius: 24, padding: 24, width: "85%", maxWidth: 320, borderWidth: 0.5, borderColor: "rgba(0,0,0,0.05)" },
+  confirmDialog: { backgroundColor: "#fff", borderRadius: 24, padding: 24, width: "85%", borderWidth: 0.5, borderColor: "rgba(0,0,0,0.05)" },
   confirmText: { fontSize: 14, textAlign: "center", color: "rgba(0,0,0,0.7)" },
   confirmButtons: { flexDirection: "row", gap: 12, marginTop: 20 },
   confirmCancel: { flex: 1, backgroundColor: "rgba(0,0,0,0.05)", borderRadius: 16, paddingVertical: 10, alignItems: "center" },

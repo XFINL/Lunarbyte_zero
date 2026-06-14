@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   userSection: { flexDirection: "row", alignItems: "center", gap: 16, paddingVertical: 24 },
   avatarContainer: { width: 64, height: 64, borderRadius: 32, backgroundColor: "rgba(0,0,0,0.05)", alignItems: "center", justifyContent: "center", overflow: "hidden" },
   avatarImage: { width: 64, height: 64 },
-  userInfo: { flex: 1, minWidth: 0 },
+  userInfo: { flex: 1 },
   editRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   nameInput: { flex: 1, backgroundColor: "rgba(0,0,0,0.05)", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, fontSize: 18, fontWeight: "600", color: "#000" },
   saveButton: { backgroundColor: "#000", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },

@@ -62,7 +62,7 @@ export default function BottomNav() {
 }
 
 const styles = StyleSheet.create({
-  container: { position: "absolute", bottom: 24, left: 24, right: 24, elevation: 50 },
+  container: { position: "absolute", bottom: 24, left: 24, right: 24 },
   navBar: {
     flexDirection: "row",
     alignItems: "center",

@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 14, color: "rgba(0,0,0,0.3)", marginTop: 16 },
   songItem: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12 },
   songCover: { width: 40, height: 40, borderRadius: 8, backgroundColor: "rgba(0,0,0,0.05)" },
-  songInfo: { flex: 1, minWidth: 0 },
+  songInfo: { flex: 1 },
   songTitle: { fontSize: 14, color: "rgba(0,0,0,0.7)" },
   songTitleActive: { color: "#000", fontWeight: "500" },
   songArtist: { fontSize: 12, color: "rgba(0,0,0,0.35)", marginTop: 2 },
