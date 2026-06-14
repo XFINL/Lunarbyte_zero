@@ -5,7 +5,6 @@ import { StatusBar } from "expo-status-bar"
 import { useEffect } from "react"
 import { useUserStore } from "@/store/userStore"
 
-import CrashLogger from "@/components/CrashLogger"
 import PlayerEngine from "@/components/PlayerEngine"
 import BottomNav from "@/components/BottomNav"
 
@@ -39,7 +38,6 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <CrashLogger />
       <StatusBar style="dark" />
       <PlayerEngine />
       <NavigationContainer>
