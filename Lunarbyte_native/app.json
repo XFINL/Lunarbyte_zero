@@ -1,25 +1,32 @@
 {
   "expo": {
-    "name": "Lunarbyte_native",
-    "slug": "Lunarbyte_native",
+    "name": "Wave Music",
+    "slug": "wavemusic",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "wavemusic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.lunarbyte.wavemusic"
     },
     "android": {
+      "package": "com.lunarbyte.wavemusic",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#ffffff",
+        "foregroundImage": "./assets/icon.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b53b4fee-59ae-4b4c-aba8-6d5898443156"
+      }
+    },
+    "owner": "lianians-team"
   }
 }
