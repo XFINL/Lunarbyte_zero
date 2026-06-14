@@ -10,7 +10,12 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease",
+        "withoutCrash": true
+      },
+      "env": {
+        "android.enableMinifyInReleaseBuilds": "false"
       }
     },
     "production": {
