@@ -2,7 +2,7 @@
   "expo": {
     "name": "Wave Music",
     "slug": "wavemusic",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,11 +13,17 @@
     },
     "android": {
       "package": "com.lunarbyte.wavemusic",
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/icon.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+        "MANAGE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -27,6 +33,18 @@
         "projectId": "b53b4fee-59ae-4b4c-aba8-6d5898443156"
       }
     },
-    "owner": "lianians-team"
+    "owner": "lianians-team",
+    "plugins": [
+      "expo-tracking-transparency",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true,
+            "allowBackup": true
+          }
+        }
+      ]
+    ]
   }
 }
